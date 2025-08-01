@@ -13,8 +13,6 @@ Thank you for your interest in contributing to the Mode Manager MCP Server!
 2. **Install dependencies:**
    ```bash
    pip install -e .
-   # OR using pipenv
-   pipenv install --dev
    ```
 
 3. **Run tests:**

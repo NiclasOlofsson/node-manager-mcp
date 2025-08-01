@@ -72,13 +72,13 @@ All entries include:
 ```bash
 git clone https://github.com/NiclasOlofsson/node-manager-mcp.git
 cd node-manager-mcp
-pipenv install
+pip install -e .
 ```
 
 ### 2. Test it works
 
 ```bash
-pipenv run python test_basic.py
+python test_basic.py
 ```
 
 ### 3. Add to VS Code
@@ -95,8 +95,8 @@ Or manually add to your VS Code MCP settings:
 {
   "mcpServers": {
     "mode-manager": {
-      "command": "pipenv",
-      "args": ["run", "python", "-m", "src.mode_manager_mcp"],
+      "command": "python",
+      "args": ["-m", "src.mode_manager_mcp"],
       "cwd": "."
     }
   }
@@ -116,13 +116,13 @@ https://raw.githubusercontent.com/NiclasOlofsson/node-manager-mcp/refs/heads/mai
 
 #### Command Line Parameter
 ```bash
-pipenv run python -m src.mode_manager_mcp --library-url "https://your-custom-library.json"
+python -m src.mode_manager_mcp --library-url "https://your-custom-library.json"
 ```
 
 #### Environment Variable
 ```bash
 export MCP_LIBRARY_URL="https://your-custom-library.json"
-pipenv run python -m src.mode_manager_mcp
+python -m src.mode_manager_mcp
 ```
 
 #### VS Code Configuration
@@ -130,8 +130,8 @@ pipenv run python -m src.mode_manager_mcp
 {
   "mcpServers": {
     "mode-manager": {
-      "command": "pipenv",
-      "args": ["run", "python", "-m", "src.mode_manager_mcp", "--library-url", "https://your-custom-library.json"],
+      "command": "python",
+      "args": ["-m", "src.mode_manager_mcp", "--library-url", "https://your-custom-library.json"],
       "cwd": "."
     }
   }

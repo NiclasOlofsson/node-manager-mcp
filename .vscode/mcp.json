@@ -1,10 +1,8 @@
 {
   "servers": {
     "mode-manager": {
-      "command": "pipenv",
+      "command": "python",
       "args": [
-        "run",
-        "python",
         "-m",
         "src.mode_manager_mcp"
       ],
