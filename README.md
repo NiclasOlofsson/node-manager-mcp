@@ -1,198 +1,101 @@
-# Mode Manager MCP
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="logo-dark-theme.svg">
+  <source media="(prefers-color-scheme: light)" srcset="logo-light-theme.svg">
+  <img alt="GitHub Copilot Memory Tool" src="logo-light-theme.svg" width="800">
+</picture>
 
-🧠 **Personal AI Memory + VS Code Prompt Management**
+# GitHub Copilot Memory Tool
 
-Streamlined MCP server that gives AI assistants a **persistent memory** of your preferences and manages VS Code `.chatmode.md` and `.instructions.md` files.
+**Finally, Copilot that actually remembers you.**
+
+Perfect timing for 2025: VS Code now loads instructions with every message. This tool gives Copilot **persistent memory** across all your conversations.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 
-## 🎯 Primary Feature: AI Memory
+## Why This Matters Now
 
-**One tool to rule them all**: `remember()`
+**2025 Game Changer**: VS Code's new behavior loads custom instructions with **every chat request** (not just session start). This means:
 
-- 🧠 **Personal AI Memory** - Store preferences, facts, and context that AI should remember about you
-- 🔄 **Auto-setup** - Creates memory file automatically in your VS Code prompts directory  
-- 💾 **Persistent** - Memories are saved as a VS Code instruction file that AI assistants can access
-- ⚡ **Simple** - Just one tool instead of managing multiple complex operations
+- **Your memories are ALWAYS active** in every conversation  
+- **No more repeating context** when you start new chats
+- **Copilot truly knows you** across sessions, topics, and projects
+- **Perfect timing** - built for the new instruction loading behavior
 
-## 🧠 Primary Usage: Personal AI Memory
+## See It In Action
 
-### Store Information About Yourself
-Ask Copilot: *"Remember that I prefer Python over JavaScript for backend development"*
+**Before this tool:**
+> *"Hey Copilot, write me a Python function..."*  
+> Copilot: *Gives generic Python code*
 
-### Add Personal Context  
-Ask Copilot: *"Remember that I work at Oatly and focus on sustainability projects"*
+**After using `remember`:**
+> You: *"Remember I'm a senior data architect at Oatly, prefer type hints, and use Black formatting"*  
+> Next conversation: *"Write me a Python function..."*  
+> Copilot: *Generates perfectly styled code with type hints, following your exact preferences*
 
-### Save Preferences
-Ask Copilot: *"Remember that I like detailed code comments and use Black for Python formatting"*
+## Dead Simple to Use
 
-### How It Works
-1. **First use** - Automatically creates `memory.instructions.md` in your VS Code prompts directory
-2. **Each memory** - Adds timestamped entries to your personal memory file
-3. **AI access** - Any AI assistant can read your memories when the instruction is active
-4. **Persistent** - Memories survive across VS Code sessions and conversations
+**One command does everything:**
 
-## 📚 The Mode Manager MCP Library
-
-The official library contains **20 curated entries** with proper license attribution:
-
-### Popular Chatmodes
-- **Beast Mode 3.1** - Advanced autonomous coding agent
-- **AI Architect** - System design and architecture specialist  
-- **Code Reviewer** - Comprehensive code review assistant
-- **Tech Lead** - Technical leadership and project management
-- **Security Expert** - Cybersecurity and secure coding practices
-
-### Professional Instructions
-- **Python Developer** - Modern Python patterns and best practices
-- **React Developer** - Frontend development with React
-- **API Design Guidelines** - RESTful API design principles
-- **Git Workflow Standards** - Professional version control practices
-- **Testing Strategy** - Comprehensive testing patterns
-
-All entries include:
-- 📄 **License information** (MIT, Apache 2.0, Open Source)
-- 👤 **Author attribution** 
-- 🏷️ **Categories and tags**
-- 🔗 **Source links** to original content
-
-## ✨ Additional Features
-
-- 📂 **Manage VS Code prompt files** - Create, edit, and organize chatmodes and instructions
-- 📚 **Browse the curated library** - Install popular chatmodes and instructions from the community with license attribution
-- 🔄 **Keep files updated** - Update chatmodes from source while preserving your custom tool settings
-- 🛡️ **Safe operations** - Automatic backups before any deletions
-- ⚙️ **Configurable library** - Use the official library or point to your own custom collection
-
-## 🚀 Quick Setup
-
-### 1. Install Hatch
-
-[Hatch](https://hatch.pypa.io/) is a modern Python project manager that handles virtual environments, dependencies, and build processes automatically.
-
-```bash
-pip install hatch
+```
+Ask Copilot: "Remember that I prefer detailed docstrings and use pytest for testing"
 ```
 
-### 2. Clone and Setup
+That's it. Copilot now knows this **forever**, across all future conversations.
 
+### What You Can Remember:
+- **Work context** - Your role, company, current projects
+- **Coding preferences** - Languages, frameworks, style guides  
+- **Project details** - Architecture decisions, naming conventions
+- **Personal workflow** - How you like to work, debug, test
+
+## How It Works Behind the Scenes
+
+1. **Auto-setup** - Creates `memory.instructions.md` in your VS Code prompts directory on first use
+2. **Smart storage** - Each memory gets timestamped and organized  
+3. **Always loaded** - VS Code's 2025 behavior means your memories are included in every chat request
+4. **Cross-session persistence** - Your memories survive VS Code restarts and new conversations
+
+## Bonus Features
+
+Beyond memory, this tool also manages your VS Code prompt ecosystem:
+- **Curated library** - 20+ professional chatmodes and instructions  
+- **File management** - Create, edit, and organize `.chatmode.md` and `.instructions.md` files
+- **Stay updated** - Update files from source while keeping your customizations
+
+## Get It Running (2 Minutes)
+
+### 1. Install from PyPI
 ```bash
-git clone https://github.com/NiclasOlofsson/node-manager-mcp.git
-cd node-manager-mcp
+pip install mode-manager-mcp
 ```
 
-Hatch will automatically create a virtual environment and install dependencies when you run commands.
-
-### 3. Test it works
-
-```bash
-hatch run test
-```
-
-### 4. Add to VS Code
-
-Copy the example configuration:
-
-```bash
-cp mcp-config-example.json .vscode/mcp.json
-```
-
-Or manually add to your VS Code MCP settings:
-
+### 2. Add to VS Code
+Add this to your VS Code MCP settings (`mcp.json`):
 ```json
 {
   "mcpServers": {
     "mode-manager": {
-      "command": "python",
-      "args": ["-m", "src.mode_manager_mcp"],
-      "cwd": "."
+      "command": "mode-manager-mcp"
     }
   }
 }
 ```
 
-**Note:** If you're developing on the project, you can also run the server in development mode:
-```bash
-# Test the server locally
-hatch run python -m src.mode_manager_mcp
-```
+That's it! Start chatting with Copilot and use: *"Remember that..."*
 
-## ⚙️ Library Configuration
+## Perfect Timing for 2025
 
-The server uses the **official Mode Manager MCP Library** by default, but you can configure it to use custom libraries for development or organizational needs.
+This tool is built specifically for VS Code's new behavior where **custom instructions load with every chat message**. This makes persistent memory incredibly powerful - your memories are always active, no matter what topic you're discussing.
 
-### Default Library
-```
-https://raw.githubusercontent.com/NiclasOlofsson/node-manager-mcp/refs/heads/main/library/memory-mode-library.json
-```
+---
 
-### Configuration Options
+**Ready to have Copilot that actually remembers you? [Get started now!](#get-it-running-2-minutes)**
 
-#### Command Line Parameter
-```bash
-python -m src.mode_manager_mcp --library-url "https://your-custom-library.json"
-```
+## Contributing
 
-#### Environment Variable
-```bash
-export MCP_LIBRARY_URL="https://your-custom-library.json"
-python -m src.mode_manager_mcp
-```
+Want to help improve this tool? Check out [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
 
-#### VS Code Configuration
-```json
-{
-  "mcpServers": {
-    "mode-manager": {
-      "command": "python",
-      "args": ["-m", "src.mode_manager_mcp", "--library-url", "https://your-custom-library.json"],
-      "cwd": "."
-    }
-  }
-}
-```
-
-### Common Use Cases
-
-**Development/Testing:**
-```bash
-# Use a local development library
-python -m http.server 8000 --directory ./library
-export MCP_LIBRARY_URL="http://localhost:8000/memory-mode-library.json"
-```
-
-**Custom Organization Library:**
-```bash
-# Point to your organization's curated library
-export MCP_LIBRARY_URL="https://raw.githubusercontent.com/yourorg/custom-prompts/main/library.json"
-```
-
-## 💡 Usage Examples
-
-### Browse the Library
-Ask Copilot: *"What chatmodes are available in the library?"*
-
-### Install a Popular Chatmode  
-Ask Copilot: *"Install Beast Mode 3.1 from the library"*
-
-### Create Your Own
-Ask Copilot: *"Create a new chatmode for API testing"*
-
-### Manage Files
-Ask Copilot: *"List my current chatmodes"* or *"Update my chatmode from its source"*
-
-## 📁 Where Files Are Stored
-
-Your prompt files live in VS Code's prompts directory:
-- **Windows:** `%APPDATA%\Code\User\prompts`
-- **macOS:** `~/Library/Application Support/Code/User/prompts`  
-- **Linux:** `~/.config/Code/User/prompts`
-
-## 🤝 Contributing
-
-Want to help improve Mode Manager MCP? Check out [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, coding guidelines, and how to submit changes.
-
-## 📄 License
+## License
 
 MIT License - see [LICENSE](LICENSE) for details.

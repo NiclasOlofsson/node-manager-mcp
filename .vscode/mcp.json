@@ -1,12 +1,7 @@
 {
-  "servers": {
-    "mode-manager": {
-      "command": "python",
-      "args": [
-        "-m",
-        "src.mode_manager_mcp"
-      ],
-      "cwd": "."
-    }
-  }
+	"servers": {
+		"mode-manager": {
+			"command": "mode-manager-mcp"
+		}
+	}
 }
