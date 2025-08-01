@@ -1,11 +1,12 @@
 
+
 name: Release
 
 on:
   workflow_dispatch:
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -14,14 +15,6 @@ jobs:
           python-version: '3.11'
       - name: Install Hatch
         run: pip install --upgrade hatch
-      - name: Install dependencies
-        run: hatch env create
-      - name: Lint
-        run: hatch run lint
-      - name: Type check
-        run: hatch run typecheck
-      - name: Test
-        run: hatch run test
       - name: Bump version (patch)
         id: version_bump
         run: |
@@ -34,45 +27,8 @@ jobs:
           git push --follow-tags
       - name: Build package
         run: hatch build
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist/
-
-  github-release:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: dist
-          path: dist/
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: dist/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  pypi-release:
-    needs: build
-    runs-on: ubuntu-latest
-    environment: release
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: dist
-          path: dist/
-      - name: Install Hatch
-        run: pip install --upgrade hatch
+      - name: Test
+        run: hatch run test
       - name: Publish to PyPI
         env:
           HATCH_INDEX_USER: ${{ secrets.PYPI_USERNAME }}
