@@ -21,7 +21,7 @@ jobs:
           hatch version release
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add pyproject.toml
+          git add src/mode_manager_mcp/__init__.py
           git commit -m "ci: bump version [skip ci]"
           git tag v$(hatch version)
           git push --follow-tags
