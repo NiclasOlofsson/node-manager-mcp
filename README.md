@@ -67,21 +67,30 @@ All entries include:
 
 ## 🚀 Quick Setup
 
-### 1. Install
+### 1. Install Hatch
+
+[Hatch](https://hatch.pypa.io/) is a modern Python project manager that handles virtual environments, dependencies, and build processes automatically.
+
+```bash
+pip install hatch
+```
+
+### 2. Clone and Setup
 
 ```bash
 git clone https://github.com/NiclasOlofsson/node-manager-mcp.git
 cd node-manager-mcp
-pip install -e .
 ```
 
-### 2. Test it works
+Hatch will automatically create a virtual environment and install dependencies when you run commands.
+
+### 3. Test it works
 
 ```bash
-python test_basic.py
+hatch run test
 ```
 
-### 3. Add to VS Code
+### 4. Add to VS Code
 
 Copy the example configuration:
 
@@ -101,6 +110,12 @@ Or manually add to your VS Code MCP settings:
     }
   }
 }
+```
+
+**Note:** If you're developing on the project, you can also run the server in development mode:
+```bash
+# Test the server locally
+hatch run python -m src.mode_manager_mcp
 ```
 
 ## ⚙️ Library Configuration

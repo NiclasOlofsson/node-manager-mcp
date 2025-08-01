@@ -313,7 +313,10 @@ class LibraryManager:
 
                 # Write to temp file to parse
                 with tempfile.NamedTemporaryFile(
-                    mode="w", suffix=INSTRUCTION_FILE_EXTENSION, delete=False, encoding="utf-8"
+                    mode="w",
+                    suffix=INSTRUCTION_FILE_EXTENSION,
+                    delete=False,
+                    encoding="utf-8",
                 ) as tmp:
                     tmp.write(file_content)
                     tmp_path = tmp.name

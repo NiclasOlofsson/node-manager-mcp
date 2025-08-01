@@ -553,7 +553,9 @@ This file contains information that I should remember about you and your prefere
 
                 if exists:
                     chatmode_files = list(prompts_dir.glob("*.chatmode.md"))
-                    instruction_files = list(prompts_dir.glob(f"*{INSTRUCTION_FILE_EXTENSION}"))
+                    instruction_files = list(
+                        prompts_dir.glob(f"*{INSTRUCTION_FILE_EXTENSION}")
+                    )
 
                     result += f"Chatmode files: {len(chatmode_files)}\\n"
                     result += f"Instruction files: {len(instruction_files)}\\n"

@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 
 INSTRUCTION_FILE_EXTENSION = ".instructions.md"
 
+
 class InstructionManager:
     """
     Manages VS Code .instructions.md files in the prompts directory.
