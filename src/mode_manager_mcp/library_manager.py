@@ -1,7 +1,7 @@
 """
 Mode Library Manager for browsing and installing chatmodes and instructions from a curated library.
 
-This module handles interaction with the Mode Manager MCP Library hosted on GitHub Gist.
+This module handles interaction with the Mode Manager MCP Library via URL fetching.
 """
 import json
 import logging
@@ -28,9 +28,11 @@ class LibraryManager:
         Initialize the library manager.
         
         Args:
-            library_url: URL to the library JSON file (defaults to official library)
+            library_url: URL to the library JSON file (defaults to the standard gist)
         """
-        self.library_url = library_url or "https://gist.github.com/NiclasOlofsson/0ffc0457b5a1d037766dc4a28c8d3c00/raw/mode-library.json"
+        # Default to the gist URL for now, but will eventually point to your git repo
+        self.library_url = library_url or "https://gist.githubusercontent.com/burkeholland/88af0249c4b6aff3820bf37898c8bacf/raw/mode-library.json"
+        
         self.chatmode_manager = ChatModeManager()
         self.instruction_manager = InstructionManager()
         self._library_cache: Optional[Dict[str, Any]] = None
@@ -39,7 +41,7 @@ class LibraryManager:
     
     def _fetch_library(self, force_refresh: bool = False) -> Dict[str, Any]:
         """
-        Fetch the library JSON from the remote URL.
+        Fetch the library JSON from the URL.
         
         Args:
             force_refresh: Whether to bypass cache and fetch fresh data
@@ -62,13 +64,14 @@ class LibraryManager:
                 headers={'User-Agent': 'Mode-Manager-MCP/1.0'}
             )
             
+            # Fetch the JSON data
             with urllib.request.urlopen(req, timeout=30) as response:
                 content = response.read()
             
             # Try different encodings
             for encoding in ['utf-8', 'utf-8-sig', 'cp1252', 'latin1']:
                 try:
-                    library_json = content.decode(encoding)
+                    text_content = content.decode(encoding)
                     break
                 except UnicodeDecodeError:
                     continue
@@ -76,10 +79,10 @@ class LibraryManager:
                 raise FileOperationError("Could not decode library content with any supported encoding")
             
             # Parse JSON
-            library_data = json.loads(library_json)
+            library_data = json.loads(text_content)
             self._library_cache = library_data
             
-            logger.info(f"Successfully fetched library: {library_data.get('name', 'Unknown')}")
+            logger.info(f"Successfully loaded library: {library_data.get('name', 'Unknown')}")
             return library_data
             
         except urllib.error.URLError as e:
@@ -192,19 +195,19 @@ class LibraryManager:
             
             item_type = item['type']
             item_data = item['data']
-            gist_url = item_data.get('gist_url')
+            content_url = item_data.get('content_location')
             
-            if not gist_url:
-                raise FileOperationError(f"No gist URL found for '{name}'")
+            if not content_url:
+                raise FileOperationError(f"No content location found for '{name}'")
             
             # Determine filename
             filename = custom_filename or item_data.get('install_name') or f"{name}.{item_type}.md"
             
-            # Fetch the content from the gist
-            logger.info(f"Fetching {item_type} content from: {gist_url}")
+            # Fetch the content from the URL
+            logger.info(f"Fetching {item_type} content from: {content_url}")
             
             req = urllib.request.Request(
-                gist_url,
+                content_url,
                 headers={'User-Agent': 'Mode-Manager-MCP/1.0'}
             )
             
@@ -248,7 +251,7 @@ class LibraryManager:
                     if success:
                         # Add source_url to track origin
                         updated_frontmatter = frontmatter.copy()
-                        updated_frontmatter['source_url'] = gist_url
+                        updated_frontmatter['source_url'] = content_url
                         updated_frontmatter['library_source'] = name
                         
                         self.chatmode_manager.update_chatmode(
@@ -262,7 +265,7 @@ class LibraryManager:
                             'type': 'chatmode',
                             'name': name,
                             'filename': filename,
-                            'source_url': gist_url,
+                            'source_url': content_url,
                             'message': f"Successfully installed chatmode '{name}' as {filename}"
                         }
                     else:
@@ -296,7 +299,7 @@ class LibraryManager:
                     if success:
                         # Add source_url to track origin
                         updated_frontmatter = frontmatter.copy()
-                        updated_frontmatter['source_url'] = gist_url
+                        updated_frontmatter['source_url'] = content_url
                         updated_frontmatter['library_source'] = name
                         
                         self.instruction_manager.update_instruction(
@@ -310,7 +313,7 @@ class LibraryManager:
                             'type': 'instruction',
                             'name': name,
                             'filename': filename,
-                            'source_url': gist_url,
+                            'source_url': content_url,
                             'message': f"Successfully installed instruction '{name}' as {filename}"
                         }
                     else:
@@ -323,7 +326,7 @@ class LibraryManager:
                 raise FileOperationError(f"Unknown item type: {item_type}")
                 
         except urllib.error.URLError as e:
-            raise FileOperationError(f"Could not fetch content from {gist_url}: {str(e)}")
+            raise FileOperationError(f"Could not fetch content from {content_url}: {str(e)}")
         except Exception as e:
             raise FileOperationError(f"Error installing '{name}' from library: {str(e)}")
     

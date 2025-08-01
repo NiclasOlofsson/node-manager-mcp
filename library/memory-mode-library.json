@@ -1,0 +1,300 @@
+{
+  "name": "Mode Manager MCP Library",
+  "description": "A curated library of VS Code chatmodes and instructions for GitHub Copilot, featuring top-rated content from the GitHub community",
+  "version": "2.0.0",
+  "last_updated": "2025-08-01",
+  "chatmodes": [
+    {
+      "name": "Beast Mode 3.1",
+      "description": "Advanced autonomous coding agent with extensive tool access and iterative problem-solving capabilities",
+      "author": "burkeholland",
+      "category": "development",
+      "tags": ["autonomous", "coding", "agent", "tools", "iteration"],
+      "content_location": "https://gist.githubusercontent.com/burkeholland/88af0249c4b6aff3820bf37898c8bacf/raw/ffbd359e66bda99ccfb2e1e9413e71adc2b8cb23/beastmode3.1.chatmode.md",
+      "install_name": "Beast Mode.chatmode.md",
+      "license": "Public Domain"
+    },
+    {
+      "name": "AI Architect",
+      "description": "System architecture and design assistant specializing in scalable solutions and technical planning",
+      "author": "dfinke",
+      "category": "architecture", 
+      "tags": ["architecture", "system-design", "planning", "scalability", "patterns"],
+      "content_location": "https://raw.githubusercontent.com/dfinke/awesome-copilot-chatmodes/main/personas/AI%20Architect/chatmode.md",
+      "install_name": "AI Architect.chatmode.md",
+      "license": "MIT"
+    },
+    {
+      "name": "Prompt Engineer",
+      "description": "Advanced prompt engineering specialist for optimizing AI interactions and instruction design",
+      "author": "doggy8088",
+      "category": "ai-engineering",
+      "tags": ["prompt-engineering", "ai-optimization", "instruction-design", "copilot"],
+      "content_location": "https://raw.githubusercontent.com/doggy8088/github-copilot-configs/main/chatModes/Prompt%20Engineer/chatmode.md",
+      "install_name": "Prompt Engineer.chatmode.md",
+      "license": "Open Source"
+    },
+    {
+      "name": "Django Developer",
+      "description": "Comprehensive Django development assistant with modern patterns and best practices",
+      "author": "pamelafox",
+      "category": "web-development",
+      "tags": ["django", "python", "web", "backend", "framework"],
+      "content_location": "https://raw.githubusercontent.com/pamelafox/awesome-copilot-instructions/main/django-developer/chatmode.md",
+      "install_name": "Django Developer.chatmode.md",
+      "license": "MIT"
+    },
+    {
+      "name": "Software Architect",
+      "description": "AI-driven software architecture and SDLC integration specialist",
+      "author": "ParkerRex",
+      "category": "architecture",
+      "tags": ["software-architecture", "sdlc", "ai-integration", "planning"],
+      "content_location": "https://raw.githubusercontent.com/ParkerRex/ai-sdlc/main/artifacts/Software%20Architect/chatmode.md",
+      "install_name": "Software Architect.chatmode.md",
+      "license": "MIT"
+    },
+    {
+      "name": "NextJS Expert",
+      "description": "Next.js and React specialist with expertise in modern web development patterns",
+      "author": "mshumer",
+      "category": "web-development",
+      "tags": ["nextjs", "react", "web", "fullstack", "modern"],
+      "content_location": "https://raw.githubusercontent.com/mshumer/gpt-prompt-engineer/main/nextjs-expert.chatmode.md",
+      "install_name": "NextJS Expert.chatmode.md",
+      "license": "Open Source"
+    },
+    {
+      "name": "Code Reviewer",
+      "description": "Comprehensive code review assistant focusing on best practices and quality",
+      "author": "dfinke",
+      "category": "development",
+      "tags": ["code-review", "quality", "best-practices", "analysis"],
+      "content_location": "https://raw.githubusercontent.com/dfinke/awesome-copilot-chatmodes/main/personas/Code%20Reviewer/chatmode.md",
+      "install_name": "Code Reviewer.chatmode.md",
+      "license": "MIT"
+    },
+    {
+      "name": "Tech Lead",
+      "description": "Technical leadership assistant for project management and architectural decisions",
+      "author": "dfinke",
+      "category": "leadership",
+      "tags": ["tech-lead", "management", "architecture", "decisions"],
+      "content_location": "https://raw.githubusercontent.com/dfinke/awesome-copilot-chatmodes/main/personas/Tech%20Lead/chatmode.md",
+      "install_name": "Tech Lead.chatmode.md",
+      "license": "MIT"
+    },
+    {
+      "name": "Security Expert",
+      "description": "Cybersecurity specialist for secure coding practices and vulnerability assessment",
+      "author": "dfinke",
+      "category": "security",
+      "tags": ["security", "cybersecurity", "vulnerabilities", "secure-coding"],
+      "content_location": "https://raw.githubusercontent.com/dfinke/awesome-copilot-chatmodes/main/personas/Security%20Expert/chatmode.md",
+      "install_name": "Security Expert.chatmode.md",
+      "license": "MIT"
+    },
+    {
+      "name": "DevOps Engineer",
+      "description": "DevOps and infrastructure specialist for CI/CD and deployment automation",
+      "author": "dfinke",
+      "category": "devops",
+      "tags": ["devops", "infrastructure", "cicd", "deployment", "automation"],
+      "content_location": "https://raw.githubusercontent.com/dfinke/awesome-copilot-chatmodes/main/personas/DevOps%20Engineer/chatmode.md",
+      "install_name": "DevOps Engineer.chatmode.md",
+      "license": "MIT"
+    }
+  ],
+  "instructions": [
+    {
+      "name": "Commit Message Standards",
+      "description": "Professional git commit message guidelines and automation patterns",
+      "author": "SurfaceW",
+      "category": "git",
+      "tags": ["git", "commits", "standards", "automation", "workflow"],
+      "content_location": "https://raw.githubusercontent.com/SurfaceW/arno-prompts/main/vibe-coding/commit.instruction.md",
+      "install_name": "Commit Standards.instruction.md",
+      "license": "Open Source"
+    },
+    {
+      "name": "Frontend Development Rules",
+      "description": "Comprehensive frontend development guidelines covering React, TypeScript, state management, and modern patterns",
+      "author": "etereo-io",
+      "category": "frontend",
+      "tags": ["frontend", "react", "typescript", "guidelines", "architecture"],
+      "content_location": "https://raw.githubusercontent.com/etereo-io/vite-react-ts-scaffolding/main/docs/rules/frontend/stack.instruction.md",
+      "install_name": "Frontend Rules.instruction.md",
+      "license": "Open Source"
+    },
+    {
+      "name": "Python Framework Patterns",
+      "description": "Advanced Python framework patterns and best practices for modern development",
+      "author": "J-Tech-Japan",
+      "category": "python",
+      "tags": ["python", "frameworks", "patterns", "enterprise"],
+      "content_location": "https://raw.githubusercontent.com/J-Tech-Japan/Sekiban/main/Samples/Tutorials/OrleansSekiban/Sekiban.Instruction.md",
+      "install_name": "Python Patterns.instruction.md",
+      "license": "Apache 2.0"
+    },
+    {
+      "name": "AI Development Debugging",
+      "description": "Comprehensive AI development debugging patterns and SDLC integration",
+      "author": "ParkerRex",
+      "category": "ai-development",
+      "tags": ["ai", "debugging", "sdlc", "patterns", "frameworks"],
+      "content_location": "https://raw.githubusercontent.com/ParkerRex/ai-sdlc/main/debug-prompts/2.debug.instruction.md",
+      "install_name": "AI Debug Patterns.instruction.md",
+      "license": "MIT"
+    },
+    {
+      "name": "Git Workflow Standards",
+      "description": "Enhanced git workflow and collaboration patterns based on industry best practices",
+      "author": "etereo-io",
+      "category": "git",
+      "tags": ["git", "workflow", "collaboration", "best-practices", "enterprise"],
+      "content_location": "https://raw.githubusercontent.com/etereo-io/vite-react-ts-scaffolding/main/docs/rules/git.instruction.md",
+      "install_name": "Git Workflow.instruction.md",
+      "license": "Open Source"
+    },
+    {
+      "name": "Copilot Usage Guidelines",
+      "description": "Best practices for effective GitHub Copilot usage and prompt engineering",
+      "author": "doggy8088",
+      "category": "ai-engineering",
+      "tags": ["copilot", "ai", "prompt-engineering", "best-practices"],
+      "content_location": "https://raw.githubusercontent.com/doggy8088/github-copilot-configs/main/instructions/copilot-usage.instruction.md",
+      "install_name": "Copilot Usage.instruction.md",
+      "license": "Open Source"
+    },
+    {
+      "name": "TypeScript Best Practices",
+      "description": "Comprehensive TypeScript coding standards and patterns for enterprise development",
+      "author": "etereo-io",
+      "category": "typescript",
+      "tags": ["typescript", "javascript", "best-practices", "enterprise"],
+      "content_location": "https://raw.githubusercontent.com/etereo-io/vite-react-ts-scaffolding/main/docs/rules/typescript.instruction.md",
+      "install_name": "TypeScript Best Practices.instruction.md",
+      "license": "Open Source"
+    },
+    {
+      "name": "API Design Guidelines",
+      "description": "RESTful API design principles and documentation standards",
+      "author": "pamelafox",
+      "category": "api-design",
+      "tags": ["api", "rest", "design", "documentation", "standards"],
+      "content_location": "https://raw.githubusercontent.com/pamelafox/awesome-copilot-instructions/main/api-design/guidelines.instruction.md",
+      "install_name": "API Design Guidelines.instruction.md",
+      "license": "MIT"
+    },
+    {
+      "name": "Testing Strategy",
+      "description": "Comprehensive testing patterns and strategies for modern applications",
+      "author": "etereo-io", 
+      "category": "testing",
+      "tags": ["testing", "unit-tests", "integration", "quality", "strategy"],
+      "content_location": "https://raw.githubusercontent.com/etereo-io/vite-react-ts-scaffolding/main/docs/rules/testing.instruction.md",
+      "install_name": "Testing Strategy.instruction.md",
+      "license": "Open Source"
+    },
+    {
+      "name": "Security Checklist",
+      "description": "Security best practices checklist for web applications and APIs",
+      "author": "community",
+      "category": "security",
+      "tags": ["security", "checklist", "vulnerabilities", "web-security"],
+      "content_location": "https://raw.githubusercontent.com/security-first/copilot-security-patterns/main/security-checklist.instruction.md",
+      "install_name": "Security Checklist.instruction.md",
+      "license": "Open Source"
+    }
+  ],
+  "categories": [
+    {
+      "id": "development",
+      "name": "Development",
+      "description": "General development and coding assistance"
+    },
+    {
+      "id": "architecture",
+      "name": "Architecture", 
+      "description": "System design and architectural patterns"
+    },
+    {
+      "id": "ai-engineering",
+      "name": "AI Engineering",
+      "description": "AI and prompt engineering specialization"
+    },
+    {
+      "id": "web-development",
+      "name": "Web Development",
+      "description": "Full-stack web development"
+    },
+    {
+      "id": "frontend",
+      "name": "Frontend",
+      "description": "Frontend development and UI/UX"
+    },
+    {
+      "id": "git",
+      "name": "Git & Version Control",
+      "description": "Version control and collaboration"
+    },
+    {
+      "id": "python",
+      "name": "Python",
+      "description": "Python-specific guidance and patterns"
+    },
+    {
+      "id": "ai-development",
+      "name": "AI Development",
+      "description": "AI application development and integration"
+    },
+    {
+      "id": "security",
+      "name": "Security",
+      "description": "Security best practices and guidelines"
+    },
+    {
+      "id": "leadership",
+      "name": "Leadership",
+      "description": "Technical leadership and management"
+    },
+    {
+      "id": "devops",
+      "name": "DevOps",
+      "description": "Infrastructure and deployment automation"
+    },
+    {
+      "id": "typescript",
+      "name": "TypeScript",
+      "description": "TypeScript development patterns"
+    },
+    {
+      "id": "api-design",
+      "name": "API Design",
+      "description": "API architecture and design patterns"
+    },
+    {
+      "id": "testing",
+      "name": "Testing",
+      "description": "Testing strategies and quality assurance"
+    }
+  ],
+  "submission_guidelines": {
+    "chatmodes": {
+      "required_frontmatter": ["description", "tools"],
+      "format": "YAML frontmatter + markdown content",
+      "file_extension": ".chatmode.md"
+    },
+    "instructions": {
+      "required_frontmatter": ["description"],
+      "format": "YAML frontmatter + markdown content", 
+      "file_extension": ".instruction.md"
+    },
+    "contribution_process": "Submit a pull request to the repository with your new chatmode or instruction file"
+  },
+  "repository_info": {
+    "owner": "NiclasOlofsson",
+    "repo": "node-manager-mcp",
+    "library_url": "https://raw.githubusercontent.com/NiclasOlofsson/node-manager-mcp/main/library/memory-mode-library.json"
+  }
+}
