@@ -19,10 +19,10 @@ jobs:
           python-version: '3.11'
       - name: Install Hatch
         run: pip install --upgrade hatch
-      - name: Bump version (release)
+      - name: Bump version (patch)
         id: version_bump
         run: |
-          hatch version release
+          hatch version patch
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add src/mode_manager_mcp/__init__.py
