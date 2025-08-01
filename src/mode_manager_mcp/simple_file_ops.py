@@ -100,7 +100,8 @@ def parse_frontmatter_file(file_path: Union[str, Path]) -> Tuple[Dict[str, Any],
 def write_frontmatter_file(
     file_path: Union[str, Path],
     frontmatter: Dict[str, Any],
-    content: str
+    content: str,
+    create_backup: bool = True
 ) -> bool:
     """
     Write a file with YAML frontmatter.
@@ -109,6 +110,7 @@ def write_frontmatter_file(
         file_path: Path to write the file
         frontmatter: Dictionary of frontmatter data
         content: Main content of the file
+        create_backup: Whether to create a backup before overwriting (default: True)
         
     Returns:
         True if successful
@@ -117,6 +119,16 @@ def write_frontmatter_file(
         FileOperationError: If file cannot be written
     """
     try:
+        # Create backup if file exists and backup is requested
+        file_path = Path(file_path)
+        if create_backup and file_path.exists():
+            import datetime
+            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            backup_path = file_path.parent / f"{file_path.stem}.backup_{timestamp}{file_path.suffix}"
+            
+            shutil.copy2(file_path, backup_path)
+            logger.info(f"Created backup before write: {backup_path}")
+        
         # Create frontmatter YAML
         frontmatter_lines = ['---']
         
@@ -146,6 +158,50 @@ def write_frontmatter_file(
         # Write file
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write(full_content)
+        
+        logger.debug(f"Successfully wrote file: {file_path}")
+        return True
+        
+    except Exception as e:
+        raise FileOperationError(f"Could not write file {file_path}: {e}")
+
+
+def write_file_with_backup(
+    file_path: Union[str, Path],
+    content: str,
+    create_backup: bool = True
+) -> bool:
+    """
+    Write a file with optional backup.
+    
+    Args:
+        file_path: Path to write the file
+        content: Content to write
+        create_backup: Whether to create a backup before overwriting (default: True)
+        
+    Returns:
+        True if successful
+        
+    Raises:
+        FileOperationError: If file cannot be written
+    """
+    try:
+        # Create backup if file exists and backup is requested
+        file_path = Path(file_path)
+        if create_backup and file_path.exists():
+            import datetime
+            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            backup_path = file_path.parent / f"{file_path.stem}.backup_{timestamp}{file_path.suffix}"
+            
+            shutil.copy2(file_path, backup_path)
+            logger.info(f"Created backup before write: {backup_path}")
+        
+        # Ensure parent directory exists
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        # Write file
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write(content)
         
         logger.debug(f"Successfully wrote file: {file_path}")
         return True

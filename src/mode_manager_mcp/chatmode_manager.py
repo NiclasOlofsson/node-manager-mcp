@@ -194,7 +194,7 @@ class ChatModeManager:
             frontmatter["tools"] = tools
         
         try:
-            success = write_frontmatter_file(file_path, frontmatter, content)
+            success = write_frontmatter_file(file_path, frontmatter, content, create_backup=False)
             if success:
                 logger.info(f"Created chatmode file: {filename}")
             return success
@@ -239,9 +239,9 @@ class ChatModeManager:
             new_frontmatter = frontmatter if frontmatter is not None else current_frontmatter
             new_content = content if content is not None else current_content
             
-            success = write_frontmatter_file(file_path, new_frontmatter, new_content)
+            success = write_frontmatter_file(file_path, new_frontmatter, new_content, create_backup=True)
             if success:
-                logger.info(f"Updated chatmode file: {filename}")
+                logger.info(f"Updated chatmode file with backup: {filename}")
             return success
             
         except Exception as e:
@@ -363,10 +363,10 @@ class ChatModeManager:
                 updated_frontmatter['tools'] = local_tools
                 logger.info(f"Preserved local tools setting: {local_tools}")
             
-            # Write updated file
-            write_frontmatter_file(file_path, updated_frontmatter, source_body)
+            # Write updated file with backup
+            write_frontmatter_file(file_path, updated_frontmatter, source_body, create_backup=True)
             
-            logger.info(f"Successfully updated chatmode from source: {filename}")
+            logger.info(f"Successfully updated chatmode from source with backup: {filename}")
             
             return {
                 'status': 'success',
