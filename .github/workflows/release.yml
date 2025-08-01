@@ -15,10 +15,10 @@ jobs:
           python-version: '3.11'
       - name: Install Hatch
         run: pip install --upgrade hatch
-      - name: Bump version (patch)
+      - name: Bump version (release)
         id: version_bump
         run: |
-          hatch version patch
+          hatch version release
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add pyproject.toml
