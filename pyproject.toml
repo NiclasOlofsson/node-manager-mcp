@@ -1,20 +1,27 @@
+
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "mode-manager-mcp"
-version = "0.2.0"
+version = "0.1.0b1"
 description = "Mode Manager MCP: Server for managing VS Code .chatmode.md and .instruction.md files (GitHub Copilot prompts)"
 readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "MIT" }
-authors = [
-    { name = "Niclas Olofsson", email = "niclas.olofsson@oatly.com" }
+authors = [{ name = "Niclas Olofsson", email = "niclas.olofsson@oatly.com" }]
+keywords = [
+    "mcp",
+    "vscode",
+    "chatmode",
+    "instruction",
+    "github-copilot",
+    "prompts",
+    "mode-manager",
 ]
-keywords = ["mcp", "vscode", "chatmode", "instruction", "github-copilot", "prompts", "mode-manager"]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
@@ -25,11 +32,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 
-dependencies = [
-    "mcp>=1.12.0",
-    "pydantic>=2.0.0",
-    "typing-extensions",
-]
+dependencies = ["mcp>=1.12.0", "pydantic>=2.0.0", "typing-extensions"]
 
 [project.optional-dependencies]
 dev = [
@@ -49,11 +52,22 @@ Documentation = "https://github.com/NiclasOlofsson/node-manager-mcp#readme"
 [project.scripts]
 mode-manager-mcp = "mode_manager_mcp.__main__:main"
 
-[tool.setuptools.packages.find]
-where = ["src"]
 
-[tool.setuptools.package-dir]
-"" = "src"
+[tool.hatch.build.targets.sdist]
+include = ["src/**", "README.md", "LICENSE", "library/**", "test_basic.py"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mode_manager_mcp"]
+
+[tool.hatch.envs.default]
+dependencies = ["pytest", "pytest-asyncio", "black", "mypy", "pre-commit"]
+
+[tool.hatch.envs.default.scripts]
+test = "pytest"
+lint = "black --check src test_basic.py"
+typecheck = "mypy src"
+format = "black src test_basic.py"
+precommit = "pre-commit run --all-files"
 
 [tool.black]
 line-length = 88
