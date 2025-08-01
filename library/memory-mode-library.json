@@ -15,13 +15,13 @@
       "license": "Public Domain"
     },
     {
-      "name": "AI Architect",
-      "description": "System architecture and design assistant specializing in scalable solutions and technical planning",
+      "name": "Security Expert",
+      "description": "Cybersecurity specialist for secure coding practices and vulnerability assessment",
       "author": "dfinke",
-      "category": "architecture", 
-      "tags": ["architecture", "system-design", "planning", "scalability", "patterns"],
-      "content_location": "https://raw.githubusercontent.com/dfinke/awesome-copilot-chatmodes/main/personas/AI%20Architect/chatmode.md",
-      "install_name": "AI Architect.chatmode.md",
+      "category": "security",
+      "tags": ["security", "cybersecurity", "vulnerabilities", "secure-coding"],
+      "content_location": "https://raw.githubusercontent.com/dfinke/awesome-copilot-chatmodes/main/chatmodes/security/security-scout/security-scout.chatmode.md",
+      "install_name": "Security Expert.chatmode.md",
       "license": "MIT"
     },
     {
@@ -30,58 +30,58 @@
       "author": "doggy8088",
       "category": "ai-engineering",
       "tags": ["prompt-engineering", "ai-optimization", "instruction-design", "copilot"],
-      "content_location": "https://raw.githubusercontent.com/doggy8088/github-copilot-configs/main/chatModes/Prompt%20Engineer/chatmode.md",
+      "content_location": "https://raw.githubusercontent.com/doggy8088/github-copilot-configs/main/chatmodes/prompt-engineer.chatmode.md",
       "install_name": "Prompt Engineer.chatmode.md",
       "license": "Open Source"
     },
     {
-      "name": "Django Developer",
-      "description": "Comprehensive Django development assistant with modern patterns and best practices",
-      "author": "pamelafox",
-      "category": "web-development",
-      "tags": ["django", "python", "web", "backend", "framework"],
-      "content_location": "https://raw.githubusercontent.com/pamelafox/awesome-copilot-instructions/main/django-developer/chatmode.md",
-      "install_name": "Django Developer.chatmode.md",
-      "license": "MIT"
-    },
-    {
-      "name": "Software Architect",
-      "description": "AI-driven software architecture and SDLC integration specialist",
-      "author": "ParkerRex",
+      "name": "Azure Architect",
+      "description": "Azure cloud architecture specialist with deep expertise in cloud solutions and best practices",
+      "author": "doggy8088",
       "category": "architecture",
-      "tags": ["software-architecture", "sdlc", "ai-integration", "planning"],
-      "content_location": "https://raw.githubusercontent.com/ParkerRex/ai-sdlc/main/artifacts/Software%20Architect/chatmode.md",
-      "install_name": "Software Architect.chatmode.md",
-      "license": "MIT"
-    },
-    {
-      "name": "NextJS Expert",
-      "description": "Next.js and React specialist with expertise in modern web development patterns",
-      "author": "mshumer",
-      "category": "web-development",
-      "tags": ["nextjs", "react", "web", "fullstack", "modern"],
-      "content_location": "https://raw.githubusercontent.com/mshumer/gpt-prompt-engineer/main/nextjs-expert.chatmode.md",
-      "install_name": "NextJS Expert.chatmode.md",
+      "tags": ["azure", "cloud", "architecture", "solutions", "best-practices"],
+      "content_location": "https://raw.githubusercontent.com/doggy8088/github-copilot-configs/main/chatmodes/azure-principal-architect.chatmode.md",
+      "install_name": "Azure Architect.chatmode.md",
       "license": "Open Source"
     },
     {
-      "name": "Code Reviewer",
-      "description": "Comprehensive code review assistant focusing on best practices and quality",
+      "name": "Debug Expert",
+      "description": "Specialized debugging assistant for identifying and resolving complex coding issues",
+      "author": "doggy8088",
+      "category": "development",
+      "tags": ["debugging", "troubleshooting", "problem-solving", "analysis"],
+      "content_location": "https://raw.githubusercontent.com/doggy8088/github-copilot-configs/main/chatmodes/debug.chatmode.md",
+      "install_name": "Debug Expert.chatmode.md",
+      "license": "Open Source"
+    },
+    {
+      "name": "Clean Code Expert",
+      "description": "Code quality specialist focusing on clean coding practices and maintainable solutions",
+      "author": "doggy8088",
+      "category": "development",
+      "tags": ["clean-code", "refactoring", "quality", "maintainability"],
+      "content_location": "https://raw.githubusercontent.com/doggy8088/github-copilot-configs/main/chatmodes/janitor.chatmode.md",
+      "install_name": "Clean Code Expert.chatmode.md",
+      "license": "Open Source"
+    },
+    {
+      "name": "Test Writer",
+      "description": "Comprehensive test writing assistant focusing on best practices and quality",
       "author": "dfinke",
       "category": "development",
-      "tags": ["code-review", "quality", "best-practices", "analysis"],
-      "content_location": "https://raw.githubusercontent.com/dfinke/awesome-copilot-chatmodes/main/personas/Code%20Reviewer/chatmode.md",
-      "install_name": "Code Reviewer.chatmode.md",
+      "tags": ["testing", "unit-tests", "quality", "best-practices", "analysis"],
+      "content_location": "https://raw.githubusercontent.com/dfinke/awesome-copilot-chatmodes/main/chatmodes/testing/test-writer/test-writer.chatmode.md",
+      "install_name": "Test Writer.chatmode.md",
       "license": "MIT"
     },
     {
-      "name": "Tech Lead",
-      "description": "Technical leadership assistant for project management and architectural decisions",
+      "name": "Prompt Designer",
+      "description": "Expert in crafting effective prompts for large language models with strategic frameworks",
       "author": "dfinke",
-      "category": "leadership",
-      "tags": ["tech-lead", "management", "architecture", "decisions"],
-      "content_location": "https://raw.githubusercontent.com/dfinke/awesome-copilot-chatmodes/main/personas/Tech%20Lead/chatmode.md",
-      "install_name": "Tech Lead.chatmode.md",
+      "category": "ai-engineering",
+      "tags": ["prompt-design", "llm", "ai-optimization", "strategy"],
+      "content_location": "https://raw.githubusercontent.com/dfinke/awesome-copilot-chatmodes/main/chatmodes/prompts/prompt-designer/prompt-designer.chatmode.md",
+      "install_name": "Prompt Designer.chatmode.md",
       "license": "MIT"
     },
     {
@@ -95,14 +95,14 @@
       "license": "MIT"
     },
     {
-      "name": "DevOps Engineer",
-      "description": "DevOps and infrastructure specialist for CI/CD and deployment automation",
-      "author": "dfinke",
-      "category": "devops",
-      "tags": ["devops", "infrastructure", "cicd", "deployment", "automation"],
-      "content_location": "https://raw.githubusercontent.com/dfinke/awesome-copilot-chatmodes/main/personas/DevOps%20Engineer/chatmode.md",
-      "install_name": "DevOps Engineer.chatmode.md",
-      "license": "MIT"
+      "name": "Expert .NET Engineer",
+      "description": "Advanced .NET development specialist with deep C# and framework expertise",
+      "author": "doggy8088",
+      "category": "development",
+      "tags": ["dotnet", "csharp", "expert", "enterprise", "development"],
+      "content_location": "https://raw.githubusercontent.com/doggy8088/github-copilot-configs/main/chatmodes/expert-dotnet-software-engineer.chatmode.md",
+      "install_name": "Expert .NET Engineer.chatmode.md",
+      "license": "Open Source"
     }
   ],
   "instructions": [
