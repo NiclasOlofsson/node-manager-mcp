@@ -40,16 +40,12 @@ class LibraryManager:
 
         self.chatmode_manager = ChatModeManager()
         self.instruction_manager = InstructionManager()
-        self._library_cache: Optional[Dict[str, Any]] = None
 
         logger.info(f"Library manager initialized with URL: {self.library_url}")
 
-    def _fetch_library(self, force_refresh: bool = False) -> Dict[str, Any]:
+    def _fetch_library(self) -> Dict[str, Any]:
         """
         Fetch the library JSON from the URL.
-
-        Args:
-            force_refresh: Whether to bypass cache and fetch fresh data
 
         Returns:
             Library data as dictionary
@@ -58,9 +54,6 @@ class LibraryManager:
             FileOperationError: If library cannot be fetched
         """
         try:
-            if self._library_cache and not force_refresh:
-                return self._library_cache
-
             logger.info(f"Fetching library from: {self.library_url}")
 
             # Create request with user agent
@@ -86,7 +79,6 @@ class LibraryManager:
 
             # Parse JSON
             library_data: Dict[str, Any] = json.loads(text_content)
-            self._library_cache = library_data
 
             logger.info(
                 f"Successfully loaded library: {library_data.get('name', 'Unknown')}"
@@ -375,13 +367,15 @@ class LibraryManager:
 
     def refresh_library(self) -> Dict[str, Any]:
         """
-        Refresh the library cache by fetching the latest version.
+        Refresh the library by fetching the latest version from the URL.
+        
+        Note: Without caching, this method now just fetches the library like any other operation.
 
         Returns:
             Updated library information
         """
         try:
-            library = self._fetch_library(force_refresh=True)
+            library = self._fetch_library()
 
             return {
                 "status": "success",
@@ -390,7 +384,7 @@ class LibraryManager:
                 "last_updated": library.get("last_updated", "Unknown"),
                 "total_chatmodes": len(library.get("chatmodes", [])),
                 "total_instructions": len(library.get("instructions", [])),
-                "message": "Library cache refreshed successfully",
+                "message": "Library refreshed successfully",
             }
 
         except Exception as e:
