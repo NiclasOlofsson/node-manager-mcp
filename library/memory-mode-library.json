@@ -113,7 +113,7 @@
       "category": "git",
       "tags": ["git", "commits", "standards", "automation", "workflow"],
       "content_location": "https://raw.githubusercontent.com/SurfaceW/arno-prompts/main/vibe-coding/commit.instruction.md",
-      "install_name": "Commit Standards.instruction.md",
+      "install_name": "Commit Standards.instructions.md",
       "license": "Open Source"
     },
     {
@@ -123,7 +123,7 @@
       "category": "frontend",
       "tags": ["frontend", "react", "typescript", "guidelines", "architecture"],
       "content_location": "https://raw.githubusercontent.com/etereo-io/vite-react-ts-scaffolding/main/docs/rules/frontend/stack.instruction.md",
-      "install_name": "Frontend Rules.instruction.md",
+      "install_name": "Frontend Rules.instructions.md",
       "license": "Open Source"
     },
     {
@@ -133,7 +133,7 @@
       "category": "python",
       "tags": ["python", "frameworks", "patterns", "enterprise"],
       "content_location": "https://raw.githubusercontent.com/J-Tech-Japan/Sekiban/main/Samples/Tutorials/OrleansSekiban/Sekiban.Instruction.md",
-      "install_name": "Python Patterns.instruction.md",
+      "install_name": "Python Patterns.instructions.md",
       "license": "Apache 2.0"
     },
     {
@@ -143,7 +143,7 @@
       "category": "ai-development",
       "tags": ["ai", "debugging", "sdlc", "patterns", "frameworks"],
       "content_location": "https://raw.githubusercontent.com/ParkerRex/ai-sdlc/main/debug-prompts/2.debug.instruction.md",
-      "install_name": "AI Debug Patterns.instruction.md",
+      "install_name": "AI Debug Patterns.instructions.md",
       "license": "MIT"
     },
     {
@@ -153,7 +153,7 @@
       "category": "git",
       "tags": ["git", "workflow", "collaboration", "best-practices", "enterprise"],
       "content_location": "https://raw.githubusercontent.com/etereo-io/vite-react-ts-scaffolding/main/docs/rules/git.instruction.md",
-      "install_name": "Git Workflow.instruction.md",
+      "install_name": "Git Workflow.instructions.md",
       "license": "Open Source"
     },
     {
@@ -163,7 +163,7 @@
       "category": "ai-engineering",
       "tags": ["copilot", "ai", "prompt-engineering", "best-practices"],
       "content_location": "https://raw.githubusercontent.com/doggy8088/github-copilot-configs/main/instructions/copilot-usage.instruction.md",
-      "install_name": "Copilot Usage.instruction.md",
+      "install_name": "Copilot Usage.instructions.md",
       "license": "Open Source"
     },
     {
@@ -173,7 +173,7 @@
       "category": "typescript",
       "tags": ["typescript", "javascript", "best-practices", "enterprise"],
       "content_location": "https://raw.githubusercontent.com/etereo-io/vite-react-ts-scaffolding/main/docs/rules/typescript.instruction.md",
-      "install_name": "TypeScript Best Practices.instruction.md",
+      "install_name": "TypeScript Best Practices.instructions.md",
       "license": "Open Source"
     },
     {
@@ -183,7 +183,7 @@
       "category": "api-design",
       "tags": ["api", "rest", "design", "documentation", "standards"],
       "content_location": "https://raw.githubusercontent.com/pamelafox/awesome-copilot-instructions/main/api-design/guidelines.instruction.md",
-      "install_name": "API Design Guidelines.instruction.md",
+      "install_name": "API Design Guidelines.instructions.md",
       "license": "MIT"
     },
     {
@@ -193,7 +193,7 @@
       "category": "testing",
       "tags": ["testing", "unit-tests", "integration", "quality", "strategy"],
       "content_location": "https://raw.githubusercontent.com/etereo-io/vite-react-ts-scaffolding/main/docs/rules/testing.instruction.md",
-      "install_name": "Testing Strategy.instruction.md",
+      "install_name": "Testing Strategy.instructions.md",
       "license": "Open Source"
     },
     {
@@ -203,7 +203,7 @@
       "category": "security",
       "tags": ["security", "checklist", "vulnerabilities", "web-security"],
       "content_location": "https://raw.githubusercontent.com/security-first/copilot-security-patterns/main/security-checklist.instruction.md",
-      "install_name": "Security Checklist.instruction.md",
+      "install_name": "Security Checklist.instructions.md",
       "license": "Open Source"
     }
   ],
@@ -288,7 +288,7 @@
     "instructions": {
       "required_frontmatter": ["description"],
       "format": "YAML frontmatter + markdown content", 
-      "file_extension": ".instruction.md"
+      "file_extension": ".instructions.md"
     },
     "contribution_process": "Submit a pull request to the repository with your new chatmode or instruction file"
   },

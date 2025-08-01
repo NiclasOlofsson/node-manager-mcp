@@ -2,7 +2,7 @@
 
 🧠 **Personal AI Memory + VS Code Prompt Management**
 
-Streamlined MCP server that gives AI assistants a **persistent memory** of your preferences and manages VS Code `.chatmode.md` and `.instruction.md` files.
+Streamlined MCP server that gives AI assistants a **persistent memory** of your preferences and manages VS Code `.chatmode.md` and `.instructions.md` files.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
@@ -28,7 +28,7 @@ Ask Copilot: *"Remember that I work at Oatly and focus on sustainability project
 Ask Copilot: *"Remember that I like detailed code comments and use Black for Python formatting"*
 
 ### How It Works
-1. **First use** - Automatically creates `memory.instruction.md` in your VS Code prompts directory
+1. **First use** - Automatically creates `memory.instructions.md` in your VS Code prompts directory
 2. **Each memory** - Adds timestamped entries to your personal memory file
 3. **AI access** - Any AI assistant can read your memories when the instruction is active
 4. **Persistent** - Memories survive across VS Code sessions and conversations

@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 [project]
 name = "mode-manager-mcp"
 version = "0.1.0b1"
-description = "Mode Manager MCP: Server for managing VS Code .chatmode.md and .instruction.md files (GitHub Copilot prompts)"
+description = "Mode Manager MCP: Server for managing VS Code .chatmode.md and .instructions.md files (GitHub Copilot prompts)"
 readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "MIT" }

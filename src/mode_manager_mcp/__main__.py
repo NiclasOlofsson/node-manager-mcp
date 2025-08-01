@@ -3,7 +3,7 @@
 Main entry point for the Mode Manager MCP Server.
 
 This script provides the command-line interface to run the MCP server
-for managing VS Code .chatmode.md and .instruction.md files (GitHub Copilot prompts).
+for managing VS Code .chatmode.md and .instructions.md files (GitHub Copilot prompts).
 """
 
 import argparse

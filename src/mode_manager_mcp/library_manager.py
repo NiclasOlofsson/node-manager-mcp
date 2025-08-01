@@ -6,6 +6,7 @@ This module handles interaction with the Mode Manager MCP Library via URL fetchi
 
 import json
 import logging
+import tempfile
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -13,7 +14,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 from .chatmode_manager import ChatModeManager
-from .instruction_manager import InstructionManager
+from .instruction_manager import INSTRUCTION_FILE_EXTENSION, InstructionManager
 from .simple_file_ops import FileOperationError
 
 logger = logging.getLogger(__name__)
@@ -312,7 +313,7 @@ class LibraryManager:
 
                 # Write to temp file to parse
                 with tempfile.NamedTemporaryFile(
-                    mode="w", suffix=".instruction.md", delete=False, encoding="utf-8"
+                    mode="w", suffix=INSTRUCTION_FILE_EXTENSION, delete=False, encoding="utf-8"
                 ) as tmp:
                     tmp.write(file_content)
                     tmp_path = tmp.name

@@ -1,5 +1,5 @@
 """
-Mode Manager for VS Code .instruction.md files.
+Mode Manager for VS Code .instructions.md files.
 
 This module handles instruction files which define custom instructions
 and workspace-specific AI guidance for VS Code Copilot.
@@ -21,9 +21,11 @@ from .simple_file_ops import (
 logger = logging.getLogger(__name__)
 
 
+INSTRUCTION_FILE_EXTENSION = ".instructions.md"
+
 class InstructionManager:
     """
-    Manages VS Code .instruction.md files in the prompts directory.
+    Manages VS Code .instructions.md files in the prompts directory.
     """
 
     def __init__(self, prompts_dir: Optional[Union[str, Path]] = None):
@@ -47,7 +49,7 @@ class InstructionManager:
 
     def list_instructions(self) -> List[Dict[str, Any]]:
         """
-        List all .instruction.md files in the prompts directory.
+        List all .instructions.md files in the prompts directory.
 
         Returns:
             List of instruction file information
@@ -57,7 +59,7 @@ class InstructionManager:
         if not self.prompts_dir.exists():
             return instructions
 
-        for file_path in self.prompts_dir.glob("*.instruction.md"):
+        for file_path in self.prompts_dir.glob(f"*{INSTRUCTION_FILE_EXTENSION}"):
             try:
                 frontmatter, content = parse_frontmatter_file(file_path)
 
@@ -66,7 +68,7 @@ class InstructionManager:
 
                 instruction_info = {
                     "filename": file_path.name,
-                    "name": file_path.stem.replace(".instruction", ""),
+                    "name": file_path.name.replace(INSTRUCTION_FILE_EXTENSION, ""),
                     "path": str(file_path),
                     "description": frontmatter.get("description", ""),
                     "frontmatter": frontmatter,
@@ -90,7 +92,7 @@ class InstructionManager:
         Get content and metadata of a specific instruction file.
 
         Args:
-            filename: Name of the .instruction.md file
+            filename: Name of the .instructions.md file
 
         Returns:
             Instruction data including frontmatter and content
@@ -98,9 +100,10 @@ class InstructionManager:
         Raises:
             FileOperationError: If file cannot be read
         """
+
         # Ensure filename has correct extension
-        if not filename.endswith(".instruction.md"):
-            filename += ".instruction.md"
+        if not filename.endswith(INSTRUCTION_FILE_EXTENSION):
+            filename += INSTRUCTION_FILE_EXTENSION
 
         file_path = self.prompts_dir / filename
 
@@ -112,7 +115,7 @@ class InstructionManager:
 
             return {
                 "filename": filename,
-                "name": file_path.stem.replace(".instruction", ""),
+                "name": filename.replace(INSTRUCTION_FILE_EXTENSION, ""),
                 "path": str(file_path),
                 "description": frontmatter.get("description", ""),
                 "frontmatter": frontmatter,
@@ -129,7 +132,7 @@ class InstructionManager:
         Get the raw file content of a specific instruction file without any processing.
 
         Args:
-            filename: Name of the .instruction.md file
+            filename: Name of the .instructions.md file
 
         Returns:
             Raw file content as string
@@ -137,9 +140,10 @@ class InstructionManager:
         Raises:
             FileOperationError: If file cannot be read
         """
+
         # Ensure filename has correct extension
-        if not filename.endswith(".instruction.md"):
-            filename += ".instruction.md"
+        if not filename.endswith(INSTRUCTION_FILE_EXTENSION):
+            filename += INSTRUCTION_FILE_EXTENSION
 
         file_path = self.prompts_dir / filename
 
@@ -160,7 +164,7 @@ class InstructionManager:
         Create a new instruction file.
 
         Args:
-            filename: Name for the new .instruction.md file
+            filename: Name for the new .instructions.md file
             description: Description of the instruction
             content: Instruction content
 
@@ -170,9 +174,10 @@ class InstructionManager:
         Raises:
             FileOperationError: If file cannot be created
         """
+
         # Ensure filename has correct extension
-        if not filename.endswith(".instruction.md"):
-            filename += ".instruction.md"
+        if not filename.endswith(INSTRUCTION_FILE_EXTENSION):
+            filename += INSTRUCTION_FILE_EXTENSION
 
         file_path = self.prompts_dir / filename
 
@@ -203,7 +208,7 @@ class InstructionManager:
         Update an existing instruction file.
 
         Args:
-            filename: Name of the .instruction.md file
+            filename: Name of the .instructions.md file
             frontmatter: New frontmatter (optional)
             content: New content (optional)
 
@@ -213,9 +218,10 @@ class InstructionManager:
         Raises:
             FileOperationError: If file cannot be updated
         """
+
         # Ensure filename has correct extension
-        if not filename.endswith(".instruction.md"):
-            filename += ".instruction.md"
+        if not filename.endswith(INSTRUCTION_FILE_EXTENSION):
+            filename += INSTRUCTION_FILE_EXTENSION
 
         file_path = self.prompts_dir / filename
 
@@ -247,7 +253,7 @@ class InstructionManager:
         Delete an instruction file with automatic backup.
 
         Args:
-            filename: Name of the .instruction.md file
+            filename: Name of the .instructions.md file
 
         Returns:
             True if successful
@@ -255,9 +261,10 @@ class InstructionManager:
         Raises:
             FileOperationError: If file cannot be deleted
         """
+
         # Ensure filename has correct extension
-        if not filename.endswith(".instruction.md"):
-            filename += ".instruction.md"
+        if not filename.endswith(INSTRUCTION_FILE_EXTENSION):
+            filename += INSTRUCTION_FILE_EXTENSION
 
         file_path = self.prompts_dir / filename
 

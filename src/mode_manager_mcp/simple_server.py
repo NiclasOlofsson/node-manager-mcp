@@ -1,10 +1,11 @@
 """
 Mode Manager MCP Server Implementation.
 
-This server provides tools for managing VS Code .chatmode.md and .instruction.md files
+This server provides tools for managing VS Code .chatmode.md and .instructions.md files
 which define custom instructions and tools for GitHub Copilot.
 """
 
+import datetime
 import json
 import logging
 import os
@@ -14,7 +15,7 @@ from typing import Optional
 from mcp.server import FastMCP
 
 from .chatmode_manager import ChatModeManager
-from .instruction_manager import InstructionManager
+from .instruction_manager import INSTRUCTION_FILE_EXTENSION, InstructionManager
 from .library_manager import LibraryManager
 from .simple_file_ops import FileOperationError
 
@@ -27,7 +28,7 @@ class ModeManagerServer:
     """
     Mode Manager MCP Server.
 
-    Provides tools for managing VS Code .chatmode.md and .instruction.md files.
+    Provides tools for managing VS Code .chatmode.md and .instructions.md files.
     """
 
     def __init__(self, library_url: Optional[str] = None):
@@ -45,7 +46,7 @@ class ModeManagerServer:
             - remember(memory_item): Store information in your personal AI memory for future conversations
             
             📂 **Additional Capabilities:**
-            - Manage .chatmode.md and .instruction.md files for GitHub Copilot
+            - Manage .chatmode.md and .instructions.md files for GitHub Copilot
             - Browse and install from the Mode Manager MCP Library
             - Auto-setup memory file in VS Code prompts directory
             
@@ -100,7 +101,7 @@ class ModeManagerServer:
                 from pathlib import Path
 
                 # Memory file location in VS Code prompts directory
-                memory_filename = "memory.instruction.md"
+                memory_filename = f"memory{INSTRUCTION_FILE_EXTENSION}"
                 memory_path = self.instruction_manager.prompts_dir / memory_filename
 
                 # Check if memory file exists
@@ -374,7 +375,7 @@ This file contains information that I should remember about you and your prefere
         @self.app.tool()
         def list_instructions() -> str:
             """
-            List all VS Code .instruction.md files in the prompts directory.
+            List all VS Code .instructions.md files in the prompts directory.
 
             Returns:
                 List of available instruction files
@@ -409,12 +410,15 @@ This file contains information that I should remember about you and your prefere
             Get content of a specific VS Code instruction file.
 
             Args:
-                filename: Name of the .instruction.md file
+                filename: Name of the .instructions.md file
 
             Returns:
                 Raw instruction file content
             """
             try:
+                # Ensure correct extension
+                if not filename.endswith(INSTRUCTION_FILE_EXTENSION):
+                    filename += INSTRUCTION_FILE_EXTENSION
                 raw_content = self.instruction_manager.get_raw_instruction(filename)
                 return raw_content
 
@@ -429,7 +433,7 @@ This file contains information that I should remember about you and your prefere
             Create a new VS Code instruction file.
 
             Args:
-                filename: Name for the new .instruction.md file
+                filename: Name for the new .instructions.md file
                 description: Description of the instruction
                 content: Instruction content
 
@@ -440,6 +444,9 @@ This file contains information that I should remember about you and your prefere
                 return "Error: Server is running in read-only mode"
 
             try:
+                # Ensure correct extension
+                if not filename.endswith(INSTRUCTION_FILE_EXTENSION):
+                    filename += INSTRUCTION_FILE_EXTENSION
                 success = self.instruction_manager.create_instruction(
                     filename, description, content
                 )
@@ -464,7 +471,7 @@ This file contains information that I should remember about you and your prefere
             Update a VS Code instruction file.
 
             Args:
-                filename: Name of the .instruction.md file
+                filename: Name of the .instructions.md file
                 description: New description (optional)
                 content: New content (optional)
 
@@ -475,6 +482,9 @@ This file contains information that I should remember about you and your prefere
                 return "Error: Server is running in read-only mode"
 
             try:
+                # Ensure correct extension
+                if not filename.endswith(INSTRUCTION_FILE_EXTENSION):
+                    filename += INSTRUCTION_FILE_EXTENSION
                 # Build frontmatter updates
                 frontmatter_updates = {}
                 if description is not None:
@@ -502,7 +512,7 @@ This file contains information that I should remember about you and your prefere
             Delete a VS Code instruction file.
 
             Args:
-                filename: Name of the .instruction.md file
+                filename: Name of the .instructions.md file
 
             Returns:
                 Success message or error
@@ -511,6 +521,9 @@ This file contains information that I should remember about you and your prefere
                 return "Error: Server is running in read-only mode"
 
             try:
+                # Ensure correct extension
+                if not filename.endswith(INSTRUCTION_FILE_EXTENSION):
+                    filename += INSTRUCTION_FILE_EXTENSION
                 success = self.instruction_manager.delete_instruction(filename)
 
                 if success:
@@ -540,7 +553,7 @@ This file contains information that I should remember about you and your prefere
 
                 if exists:
                     chatmode_files = list(prompts_dir.glob("*.chatmode.md"))
-                    instruction_files = list(prompts_dir.glob("*.instruction.md"))
+                    instruction_files = list(prompts_dir.glob(f"*{INSTRUCTION_FILE_EXTENSION}"))
 
                     result += f"Chatmode files: {len(chatmode_files)}\\n"
                     result += f"Instruction files: {len(instruction_files)}\\n"
@@ -638,7 +651,7 @@ This file contains information that I should remember about you and your prefere
                         result += f"   🏷️ Category: {inst.get('category', 'Unknown')}\\n"
                         if inst.get("tags"):
                             result += f"   🔖 Tags: {', '.join(inst['tags'])}\\n"
-                        result += f"   📁 Install as: {inst.get('install_name', inst['name'] + '.instruction.md')}\\n"
+                        result += f"   📁 Install as: {inst.get('install_name', inst['name'] + INSTRUCTION_FILE_EXTENSION)}\\n"
                         result += "\\n"
                 else:
                     result += "📋 No instructions found matching your criteria.\\n\\n"
