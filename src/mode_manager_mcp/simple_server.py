@@ -34,17 +34,17 @@ class ModeManagerServer:
         self.app = FastMCP(
             name="Mode Manager MCP", 
             instructions="""
-            This server provides tools for managing VS Code prompt files including .chatmode.md and .instruction.md files.
+            This server provides tools for managing VS Code prompt files and user memory.
             
-            Key capabilities:
-            - List, create, update, and delete chatmode files for GitHub Copilot
-            - Manage instruction files for workspace-specific AI guidance  
+            🧠 **PRIMARY FEATURE - User Memory Management:**
+            - remember(memory_item): Store information in your personal AI memory for future conversations
+            
+            📂 **Additional Capabilities:**
+            - Manage .chatmode.md and .instruction.md files for GitHub Copilot
             - Browse and install from the Mode Manager MCP Library
-            - Browse and organize prompt files in the .github directory
-            - Support for read-only mode to prevent modifications
+            - Auto-setup memory file in VS Code prompts directory
             
-            Use list_chatmodes() to see available chat modes, get_chatmode() to read specific files,
-            create_chatmode() to add new AI interaction patterns, and browse_mode_library() to explore the library.
+            💡 **Main Usage**: Use remember("information") to store anything you want AI assistants to remember about you.
             """
         )
         self.chatmode_manager = ChatModeManager()
@@ -61,6 +61,89 @@ class ModeManagerServer:
     
     def _register_tools(self) -> None:
         """Register all MCP tools."""
+        
+        @self.app.tool()
+        def remember(memory_item: str) -> str:
+            """
+            Store information in your personal AI memory for future conversations.
+            
+            This is the main tool for memory management. It automatically:
+            - Sets up your memory file if it doesn't exist
+            - Adds new memories to your personal instruction file
+            - Maintains your memories in VS Code's prompts directory
+            
+            Args:
+                memory_item: The information you want to remember (preferences, facts, context, etc.)
+                
+            Returns:
+                Confirmation of what was remembered
+            """
+            if self.read_only:
+                return "Error: Server is running in read-only mode"
+            
+            try:
+                import datetime
+                from pathlib import Path
+                
+                # Memory file location in VS Code prompts directory
+                memory_filename = "memory.instruction.md"
+                memory_path = self.instruction_manager.prompts_dir / memory_filename
+                
+                # Check if memory file exists
+                if not memory_path.exists():
+                    # Create initial memory file
+                    initial_content = """# Personal AI Memory
+
+This file contains information that I should remember about you and your preferences for future conversations.
+
+## Memories
+
+"""
+                    success = self.instruction_manager.create_instruction(
+                        memory_filename,
+                        "Personal AI memory for conversations and preferences",
+                        initial_content
+                    )
+                    
+                    if not success:
+                        return "Error: Failed to create memory file"
+                    
+                    logger.info("Created new memory file for user")
+                
+                # Add the new memory item
+                current_memory = self.instruction_manager.get_instruction(memory_filename)
+                current_content = current_memory['content']
+                
+                # Add timestamp and new memory
+                timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+                new_memory_entry = f"- **{timestamp}**: {memory_item}\n"
+                
+                # Append to the memories section
+                if "## Memories" in current_content:
+                    # Add after the Memories header
+                    updated_content = current_content.replace(
+                        "## Memories\n",
+                        f"## Memories\n{new_memory_entry}"
+                    )
+                else:
+                    # Add memories section if it doesn't exist
+                    updated_content = current_content + f"\n## Memories\n{new_memory_entry}"
+                
+                # Update the memory file
+                success = self.instruction_manager.update_instruction(
+                    memory_filename,
+                    content=updated_content
+                )
+                
+                if success:
+                    return f"✅ Remembered: {memory_item}\\n\\n📁 Stored in: {memory_path}\\n\\n💡 This memory will be available to AI assistants when the memory instruction is active in VS Code."
+                else:
+                    return "Error: Failed to update memory file"
+                    
+            except FileOperationError as e:
+                return f"Error managing memory: {str(e)}"
+            except Exception as e:
+                return f"Unexpected error: {str(e)}"
         
         @self.app.tool()
         def list_chatmodes() -> str:
