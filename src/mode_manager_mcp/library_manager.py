@@ -85,7 +85,7 @@ class LibraryManager:
                 )
 
             # Parse JSON
-            library_data = json.loads(text_content)
+            library_data: Dict[str, Any] = json.loads(text_content)
             self._library_cache = library_data
 
             logger.info(

@@ -55,7 +55,7 @@ class InstructionManager:
         Returns:
             List of instruction file information
         """
-        instructions = []
+        instructions: List[Dict[str, Any]] = []
 
         if not self.prompts_dir.exists():
             return instructions
@@ -186,10 +186,7 @@ class InstructionManager:
             raise FileOperationError(f"Instruction file already exists: {filename}")
 
         # Create frontmatter with applyTo field so instructions are actually applied
-        frontmatter: Dict[str, Any] = {
-            "applyTo": "**",
-            "description": description
-        }
+        frontmatter: Dict[str, Any] = {"applyTo": "**", "description": description}
 
         try:
             success = write_frontmatter_file(

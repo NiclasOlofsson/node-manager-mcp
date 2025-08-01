@@ -54,7 +54,7 @@ class ChatModeManager:
         Returns:
             List of chatmode file information
         """
-        chatmodes = []
+        chatmodes: List[Dict[str, Any]] = []
 
         if not self.prompts_dir.exists():
             return chatmodes
