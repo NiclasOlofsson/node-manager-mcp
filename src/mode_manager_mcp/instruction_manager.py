@@ -185,8 +185,11 @@ class InstructionManager:
         if file_path.exists():
             raise FileOperationError(f"Instruction file already exists: {filename}")
 
-        # Create frontmatter
-        frontmatter: Dict[str, Any] = {"description": description}
+        # Create frontmatter with applyTo field so instructions are actually applied
+        frontmatter: Dict[str, Any] = {
+            "applyTo": "**",
+            "description": description
+        }
 
         try:
             success = write_frontmatter_file(
