@@ -74,7 +74,7 @@ pip install mode-manager-mcp
 Add this to your VS Code MCP settings (`mcp.json`):
 ```json
 {
-  "mcpServers": {
+  "servers": {
     "mode-manager": {
       "command": "mode-manager-mcp"
     }
