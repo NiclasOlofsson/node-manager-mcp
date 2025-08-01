@@ -18,6 +18,8 @@ jobs:
         run: pip install --upgrade hatch
       - name: Install dependencies
         run: hatch env create
+      - name: Format
+        run: hatch run format
       - name: Lint
         run: hatch run lint
       - name: Type check
