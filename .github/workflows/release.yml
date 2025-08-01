@@ -11,6 +11,7 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    environment: release
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -34,6 +35,6 @@ jobs:
         run: hatch run test
       - name: Publish to PyPI
         env:
-          HATCH_INDEX_USER: ${{ secrets.PYPI_USERNAME }}
-          HATCH_INDEX_AUTH: ${{ secrets.PYPI_PASSWORD }}
+          HATCH_INDEX_USER: __token__
+          HATCH_INDEX_AUTH: ${{ secrets.PYPI_API_TOKEN }}
         run: hatch publish
