@@ -1,0 +1,14 @@
+{
+  "servers": {
+    "mode-manager": {
+      "command": "pipenv",
+      "args": [
+        "run",
+        "python",
+        "-m",
+        "src.mode_manager_mcp"
+      ],
+      "cwd": "."
+    }
+  }
+}
