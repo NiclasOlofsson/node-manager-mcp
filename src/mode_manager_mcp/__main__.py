@@ -45,6 +45,12 @@ def parse_arguments() -> argparse.Namespace:
     )
     
     parser.add_argument(
+        "--library-url",
+        type=str,
+        help="Custom URL for the Mode Manager MCP Library (defaults to official GitHub repo). Can also be set via MCP_LIBRARY_URL environment variable."
+    )
+    
+    parser.add_argument(
         "--version",
         action="version",
         version="%(prog)s 0.2.0"
@@ -66,7 +72,7 @@ def main() -> None:
         os.environ["MCP_CHATMODE_READ_ONLY"] = "true"
     
     # Create and run the server
-    server = create_server()
+    server = create_server(library_url=args.library_url)
     
     try:
         # Run the server with stdio transport (MCP standard)

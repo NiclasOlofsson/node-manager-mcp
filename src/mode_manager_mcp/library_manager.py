@@ -28,10 +28,10 @@ class LibraryManager:
         Initialize the library manager.
         
         Args:
-            library_url: URL to the library JSON file (defaults to the standard gist)
+            library_url: URL to the library JSON file (defaults to the official Mode Manager MCP library)
         """
-        # Default to the gist URL for now, but will eventually point to your git repo
-        self.library_url = library_url or "https://gist.githubusercontent.com/burkeholland/88af0249c4b6aff3820bf37898c8bacf/raw/mode-library.json"
+        # Default to the official Mode Manager MCP library in the GitHub repository
+        self.library_url = library_url or "https://raw.githubusercontent.com/NiclasOlofsson/node-manager-mcp/refs/heads/main/library/memory-mode-library.json"
         
         self.chatmode_manager = ChatModeManager()
         self.instruction_manager = InstructionManager()

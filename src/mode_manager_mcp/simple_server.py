@@ -29,8 +29,12 @@ class ModeManagerServer:
     Provides tools for managing VS Code .chatmode.md and .instruction.md files.
     """
     
-    def __init__(self):
-        """Initialize the server."""
+    def __init__(self, library_url: Optional[str] = None):
+        """Initialize the server.
+        
+        Args:
+            library_url: Custom URL for the Mode Manager MCP Library (optional)
+        """
         self.app = FastMCP(
             name="Mode Manager MCP", 
             instructions="""
@@ -49,13 +53,22 @@ class ModeManagerServer:
         )
         self.chatmode_manager = ChatModeManager()
         self.instruction_manager = InstructionManager()
-        self.library_manager = LibraryManager()
+        
+        # Allow library URL to be configured via parameter, environment variable, or use default
+        final_library_url = (
+            library_url or 
+            os.getenv("MCP_LIBRARY_URL") or 
+            "https://raw.githubusercontent.com/NiclasOlofsson/node-manager-mcp/refs/heads/main/library/memory-mode-library.json"
+        )
+        self.library_manager = LibraryManager(library_url=final_library_url)
+        
         self.read_only = os.getenv("MCP_CHATMODE_READ_ONLY", "false").lower() == "true"
         
         # Register all tools
         self._register_tools()
         
         logger.info("Mode Manager MCP Server initialized")
+        logger.info(f"Using library URL: {final_library_url}")
         if self.read_only:
             logger.info("Running in READ-ONLY mode")
     
@@ -84,7 +97,7 @@ class ModeManagerServer:
             try:
                 import datetime
                 from pathlib import Path
-                
+
                 # Memory file location in VS Code prompts directory
                 memory_filename = "memory.instruction.md"
                 memory_path = self.instruction_manager.prompts_dir / memory_filename
@@ -665,6 +678,10 @@ This file contains information that I should remember about you and your prefere
         self.app.run()
 
 
-def create_server() -> ModeManagerServer:
-    """Create and return a Mode Manager MCP Server instance."""
-    return ModeManagerServer()
+def create_server(library_url: Optional[str] = None) -> ModeManagerServer:
+    """Create and return a Mode Manager MCP Server instance.
+    
+    Args:
+        library_url: Custom URL for the Mode Manager MCP Library (optional)
+    """
+    return ModeManagerServer(library_url=library_url)
