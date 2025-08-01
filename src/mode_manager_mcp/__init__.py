@@ -7,5 +7,5 @@ and GitHub Copilot instructions.
 
 from .simple_server import create_server
 
-__version__ = "0.2.0"
+__version__ = "0.1.0b2"
 __all__ = ["create_server"]
