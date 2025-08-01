@@ -59,7 +59,10 @@ include = ["src/**", "README.md", "LICENSE", "library/**", "test_basic.py"]
 [tool.hatch.build.targets.wheel]
 packages = ["src/mode_manager_mcp"]
 
+
 [tool.hatch.envs.default]
+type = "virtual"
+path = ".venv"
 dependencies = ["pytest", "pytest-asyncio", "black", "mypy", "pre-commit"]
 
 [tool.hatch.envs.default.scripts]
