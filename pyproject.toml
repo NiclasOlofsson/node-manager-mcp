@@ -67,9 +67,9 @@ dependencies = ["pytest", "pytest-asyncio", "black", "mypy", "pre-commit"]
 
 [tool.hatch.envs.default.scripts]
 test = "pytest"
-lint = "black --check src test_basic.py"
+lint = "black --check src tests/test_basic.py"
 typecheck = "mypy src"
-format = "black src test_basic.py"
+format = "black src tests/test_basic.py"
 precommit = "pre-commit run --all-files"
 
 [tool.black]

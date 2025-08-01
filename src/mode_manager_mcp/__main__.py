@@ -19,9 +19,7 @@ def setup_logging(debug: bool = False) -> None:
     logging.basicConfig(
         level=level,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        handlers=[
-            logging.StreamHandler(sys.stderr)
-        ]
+        handlers=[logging.StreamHandler(sys.stderr)],
     )
 
 
@@ -29,55 +27,48 @@ def parse_arguments() -> argparse.Namespace:
     """Parse command-line arguments."""
     parser = argparse.ArgumentParser(
         description="Mode Manager MCP Server - Manage .chatmode.md files for GitHub Copilot",
-        prog="mode-manager-mcp"
+        prog="mode-manager-mcp",
     )
-    
-    parser.add_argument(
-        "--debug",
-        action="store_true",
-        help="Enable debug logging"
-    )
-    
+
+    parser.add_argument("--debug", action="store_true", help="Enable debug logging")
+
     parser.add_argument(
         "--read-only",
         action="store_true",
-        help="Run server in read-only mode (no write operations)"
+        help="Run server in read-only mode (no write operations)",
     )
-    
+
     parser.add_argument(
         "--library-url",
         type=str,
-        help="Custom URL for the Mode Manager MCP Library (defaults to official GitHub repo). Can also be set via MCP_LIBRARY_URL environment variable."
+        help="Custom URL for the Mode Manager MCP Library (defaults to official GitHub repo). Can also be set via MCP_LIBRARY_URL environment variable.",
     )
-    
-    parser.add_argument(
-        "--version",
-        action="version",
-        version="%(prog)s 0.2.0"
-    )
-    
+
+    parser.add_argument("--version", action="version", version="%(prog)s 0.2.0")
+
     return parser.parse_args()
 
 
 def main() -> None:
     """Main entry point."""
     args = parse_arguments()
-    
+
     # Set up logging
     setup_logging(args.debug)
-    
+
     # Set read-only mode environment variable if specified
     if args.read_only:
         import os
+
         os.environ["MCP_CHATMODE_READ_ONLY"] = "true"
-    
+
     # Create and run the server
     server = create_server(library_url=args.library_url)
-    
+
     try:
         # Run the server with stdio transport (MCP standard)
         server.run()
-            
+
     except KeyboardInterrupt:
         logging.info("Server stopped by user")
     except Exception as e:
