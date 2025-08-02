@@ -32,11 +32,11 @@ class InstructionManager:
         new_entry: str,
     ) -> bool:
         """
-        Append a new entry to a specific section in an instruction file.
+        Append a new entry to the end of an instruction file (fast append).
 
         Args:
             filename: Name of the .instructions.md file
-            section_header: Section header to append to (e.g., '## Memories')
+            section_header: Ignored (kept for compatibility)
             new_entry: Content to append (should include any formatting, e.g., '- ...')
 
         Returns:
@@ -45,7 +45,6 @@ class InstructionManager:
         Raises:
             FileOperationError: If file cannot be updated
         """
-        # Ensure filename has correct extension
         if not filename.endswith(INSTRUCTION_FILE_EXTENSION):
             filename += INSTRUCTION_FILE_EXTENSION
 
@@ -55,47 +54,14 @@ class InstructionManager:
             raise FileOperationError(f"Instruction file not found: {filename}")
 
         try:
-            current_frontmatter, current_content = parse_frontmatter_file(file_path)
-            lines = current_content.splitlines()
-            section_start = None
-            for i, line in enumerate(lines):
-                if line.strip().lower() == section_header.strip().lower():
-                    section_start = i
-                    break
-
-            if section_start is not None:
-                # Find the end of the section (next section header or end of file)
-                insert_at = len(lines)
-                for j in range(section_start + 1, len(lines)):
-                    if lines[j].startswith("## "):
-                        insert_at = j
-                        break
-                # Remove trailing blank line before inserting if present
-                if insert_at > section_start + 1 and lines[insert_at - 1].strip() == "":
-                    del lines[insert_at - 1]
-                    insert_at -= 1
-                # Insert the new entry at the end of the section
-                lines.insert(insert_at, new_entry)
-                new_content = "\n".join(lines)
-                if not new_content.endswith("\n"):
-                    new_content += "\n"
-            else:
-                # If section does not exist, append at end
-                new_content = (
-                    current_content.rstrip("\n") + f"\n{section_header}\n{new_entry}\n"
-                )
-
-            success = write_frontmatter_file(
-                file_path, current_frontmatter, new_content, create_backup=True
-            )
-            if success:
-                logger.info(f"Appended to section '{section_header}' in: {filename}")
-            return success
-
+            with open(file_path, "a", encoding="utf-8") as f:
+                # Ensure entry ends with a newline
+                entry = new_entry if new_entry.endswith("\n") else new_entry + "\n"
+                f.write(entry)
+            logger.info(f"Appended entry to end of: {filename}")
+            return True
         except Exception as e:
-            raise FileOperationError(
-                f"Error appending to section '{section_header}' in {filename}: {e}"
-            )
+            raise FileOperationError(f"Error appending entry to {filename}: {e}")
 
     """
     Manages VS Code .instructions.md files in the prompts directory.

@@ -518,15 +518,13 @@ class ModeManagerServer:
                     logger.info("Created new memory file for user")
                 timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
                 new_memory_entry = f"- {timestamp}: {memory_item}\n"
-                success = instruction_manager.append_to_section(
-                    memory_filename,
-                    section_header="## Memories",
-                    new_entry=new_memory_entry,
-                )
-                if success:
-                    return f"Remembered: {memory_item}\nThis memory will be available to AI assistants when the memory instruction is active in VS Code."
-                else:
-                    return f"Error: Failed to update memory file at {memory_path}"
+                # Directly append to the file
+                try:
+                    with open(memory_path, "a", encoding="utf-8") as f:
+                        f.write(new_memory_entry)
+                except Exception as e:
+                    return f"Error: Failed to append memory: {str(e)}"
+                return f"Remembered: {memory_item}\nThis memory will be available to AI assistants when the memory instruction is active in VS Code."
             except Exception as e:
                 return f"Error: Exception occurred: {str(e)}"
 
