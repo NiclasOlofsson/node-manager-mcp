@@ -25,7 +25,9 @@ class LibraryManager:
     Manages the Mode Manager MCP Library for browsing and installing modes/instructions.
     """
 
-    def __init__(self, library_url: Optional[str] = None, prompts_dir: Optional[str] = None):
+    def __init__(
+        self, library_url: Optional[str] = None, prompts_dir: Optional[str] = None
+    ):
         """
         Initialize the library manager.
 

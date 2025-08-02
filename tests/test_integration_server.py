@@ -6,7 +6,7 @@ from mode_manager_mcp.simple_server import ModeManagerServer
 
 # The session-scoped fixture in conftest.py yields the temp prompts directory.
 @pytest.fixture()
-def server(global_patch_and_tempdir) -> ModeManagerServer:
+def server(global_patch_and_tempdir: str) -> ModeManagerServer:
     return ModeManagerServer(prompts_dir=global_patch_and_tempdir)
 
 

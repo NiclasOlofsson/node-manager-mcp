@@ -33,7 +33,9 @@ class ModeManagerServer:
     Provides tools for managing VS Code .chatmode.md and .instructions.md files.
     """
 
-    def __init__(self, library_url: Optional[str] = None, prompts_dir: Optional[str] = None):
+    def __init__(
+        self, library_url: Optional[str] = None, prompts_dir: Optional[str] = None
+    ):
         """Initialize the server.
 
         Args:
@@ -80,7 +82,9 @@ class ModeManagerServer:
             or os.getenv("MCP_LIBRARY_URL")
             or "https://raw.githubusercontent.com/NiclasOlofsson/node-manager-mcp/refs/heads/main/library/memory-mode-library.json"
         )
-        self.library_manager = LibraryManager(library_url=final_library_url, prompts_dir=prompts_dir)
+        self.library_manager = LibraryManager(
+            library_url=final_library_url, prompts_dir=prompts_dir
+        )
 
         self.read_only = os.getenv("MCP_CHATMODE_READ_ONLY", "false").lower() == "true"
 

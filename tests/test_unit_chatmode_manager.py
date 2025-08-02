@@ -4,14 +4,16 @@ from mode_manager_mcp.chatmode_manager import ChatModeManager
 
 
 @pytest.fixture
-def prompts_dir(global_patch_and_tempdir):
+def prompts_dir(global_patch_and_tempdir: str) -> str:
     return global_patch_and_tempdir
+
 
 def test_chatmode_manager_create_and_delete(prompts_dir: str) -> None:
     cm = ChatModeManager(prompts_dir=prompts_dir)
     filename = "unit_test.chatmode.md"
     assert cm.create_chatmode(filename, "desc", "content", ["tool1"]) is True
     assert cm.delete_chatmode(filename) is True
+
 
 def test_chatmode_manager_format_and_frontmatter(prompts_dir: str) -> None:
     cm = ChatModeManager(prompts_dir=prompts_dir)
