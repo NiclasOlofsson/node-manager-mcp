@@ -1,7 +1,7 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="logo-dark-theme.svg">
   <source media="(prefers-color-scheme: light)" srcset="logo-light-theme.svg">
-  <img alt="GitHub Copilot Memory Tool" src="logo-light-theme.svg" width="800">
+  <img alt="GitHub Copilot Memory Tool" src="https://raw.githubusercontent.com/NiclasOlofsson/mode-manager-mcp/refs/heads/main/logo-light-theme.svg" width="800">
 </picture>
 
 # GitHub Copilot Memory Tool
