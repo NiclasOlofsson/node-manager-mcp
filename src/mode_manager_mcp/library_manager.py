@@ -368,7 +368,7 @@ class LibraryManager:
     def refresh_library(self) -> Dict[str, Any]:
         """
         Refresh the library by fetching the latest version from the URL.
-        
+
         Note: Without caching, this method now just fetches the library like any other operation.
 
         Returns:

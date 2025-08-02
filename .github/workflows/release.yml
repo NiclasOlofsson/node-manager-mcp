@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  id-token: write
 
 jobs:
   release:
@@ -34,7 +35,4 @@ jobs:
       - name: Test
         run: hatch run test
       - name: Publish to PyPI
-        env:
-          HATCH_INDEX_USER: ${{ secrets.PYPI_USERNAME }}
-          HATCH_INDEX_AUTH: ${{ secrets.PYPI_PASSWORD }}
-        run: hatch publish
+        uses: pypa/gh-action-pypi-publish@release/v1
