@@ -81,7 +81,9 @@ class InstructionManager:
                     new_content += "\n"
             else:
                 # If section does not exist, append at end
-                new_content = current_content.rstrip("\n") + f"\n{section_header}\n{new_entry}\n"
+                new_content = (
+                    current_content.rstrip("\n") + f"\n{section_header}\n{new_entry}\n"
+                )
 
             success = write_frontmatter_file(
                 file_path, current_frontmatter, new_content, create_backup=True
@@ -91,7 +93,10 @@ class InstructionManager:
             return success
 
         except Exception as e:
-            raise FileOperationError(f"Error appending to section '{section_header}' in {filename}: {e}")
+            raise FileOperationError(
+                f"Error appending to section '{section_header}' in {filename}: {e}"
+            )
+
     """
     Manages VS Code .instructions.md files in the prompts directory.
     """
