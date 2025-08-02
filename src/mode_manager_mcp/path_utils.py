@@ -11,6 +11,37 @@ import platform
 from pathlib import Path
 from typing import Optional
 
+# For process inspection
+try:
+    import psutil
+except ImportError:
+    psutil = None
+
+
+def detect_vscode_variant() -> Optional[str]:
+    """
+    Detect if running inside VS Code Insiders or stable by inspecting parent process name.
+
+    Returns:
+        'insiders' if VS Code Insiders, 'stable' if VS Code stable, None otherwise
+    """
+    if psutil is None:
+        logger.warning(
+            "psutil not installed; cannot detect VS Code variant by process."
+        )
+        return None
+    try:
+        parent = psutil.Process(os.getppid())
+        proc_name = parent.name().lower()
+        if "insiders" in proc_name:
+            return "insiders"
+        elif "code" in proc_name:
+            return "stable"
+    except Exception as e:
+        logger.error(f"Error detecting VS Code variant: {e}")
+    return None
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -25,30 +56,46 @@ def get_vscode_user_directory() -> Path:
         OSError: If VS Code directory cannot be found
     """
     system = platform.system()
+    variant = detect_vscode_variant()
 
     if system == "Windows":
-        # Windows: %APPDATA%\Code\User
         appdata = os.environ.get("APPDATA")
         if appdata:
-            vscode_dir = Path(appdata) / "Code" / "User"
+            insiders_dir = Path(appdata) / "Code - Insiders" / "User"
+            stable_dir = Path(appdata) / "Code" / "User"
         else:
-            # Fallback to local appdata
             localappdata = os.environ.get(
                 "LOCALAPPDATA", os.path.expanduser("~\\AppData\\Local")
             )
-            vscode_dir = Path(localappdata) / "Programs" / "Microsoft VS Code" / "User"
+            insiders_dir = (
+                Path(localappdata) / "Programs" / "Microsoft VS Code Insiders" / "User"
+            )
+            stable_dir = Path(localappdata) / "Programs" / "Microsoft VS Code" / "User"
 
     elif system == "Darwin":
-        # macOS: ~/Library/Application Support/Code/User
-        vscode_dir = Path.home() / "Library" / "Application Support" / "Code" / "User"
+        insiders_dir = (
+            Path.home() / "Library" / "Application Support" / "Code - Insiders" / "User"
+        )
+        stable_dir = Path.home() / "Library" / "Application Support" / "Code" / "User"
 
     else:
-        # Linux: ~/.config/Code/User
         config_home = os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")
-        vscode_dir = Path(config_home) / "Code" / "User"
+        insiders_dir = Path(config_home) / "Code - Insiders" / "User"
+        stable_dir = Path(config_home) / "Code" / "User"
 
-    logger.debug(f"VS Code user directory: {vscode_dir}")
-    return vscode_dir
+    # Use detected variant if possible
+    if variant == "insiders":
+        logger.debug(f"VS Code Insiders user directory (by process): {insiders_dir}")
+        return insiders_dir
+    elif variant == "stable":
+        logger.debug(f"VS Code stable user directory (by process): {stable_dir}")
+        return stable_dir
+    # Fallback: Prefer Insiders if present
+    if insiders_dir.exists():
+        logger.debug(f"VS Code Insiders user directory: {insiders_dir}")
+        return insiders_dir
+    logger.debug(f"VS Code stable user directory: {stable_dir}")
+    return stable_dir
 
 
 def get_vscode_prompts_directory() -> Path:
@@ -58,11 +105,9 @@ def get_vscode_prompts_directory() -> Path:
     Returns:
         Path to prompts directory (creates if not exists)
     """
-    prompts_dir = get_vscode_user_directory() / "prompts"
-
-    # Create directory if it doesn't exist
+    user_dir = get_vscode_user_directory()
+    prompts_dir = user_dir / "prompts"
     prompts_dir.mkdir(parents=True, exist_ok=True)
-
     logger.debug(f"VS Code prompts directory: {prompts_dir}")
     return prompts_dir
 
