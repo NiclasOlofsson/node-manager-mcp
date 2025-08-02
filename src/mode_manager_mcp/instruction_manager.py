@@ -27,7 +27,7 @@ INSTRUCTION_FILE_EXTENSION = ".instructions.md"
 class InstructionManager:
     def append_to_section(
         self,
-        filename: str,
+        instruction_name: str,
         section_header: str,
         new_entry: str,
     ) -> bool:
@@ -35,7 +35,7 @@ class InstructionManager:
         Append a new entry to the end of an instruction file (fast append).
 
         Args:
-            filename: Name of the .instructions.md file
+            instruction_name: Name of the .instructions.md file
             section_header: Ignored (kept for compatibility)
             new_entry: Content to append (should include any formatting, e.g., '- ...')
 
@@ -45,23 +45,25 @@ class InstructionManager:
         Raises:
             FileOperationError: If file cannot be updated
         """
-        if not filename.endswith(INSTRUCTION_FILE_EXTENSION):
-            filename += INSTRUCTION_FILE_EXTENSION
+        if not instruction_name.endswith(INSTRUCTION_FILE_EXTENSION):
+            instruction_name += INSTRUCTION_FILE_EXTENSION
 
-        file_path = self.prompts_dir / filename
+        file_path = self.prompts_dir / instruction_name
 
         if not file_path.exists():
-            raise FileOperationError(f"Instruction file not found: {filename}")
+            raise FileOperationError(f"Instruction file not found: {instruction_name}")
 
         try:
             with open(file_path, "a", encoding="utf-8") as f:
                 # Ensure entry ends with a newline
                 entry = new_entry if new_entry.endswith("\n") else new_entry + "\n"
                 f.write(entry)
-            logger.info(f"Appended entry to end of: {filename}")
+            logger.info(f"Appended entry to end of: {instruction_name}")
             return True
         except Exception as e:
-            raise FileOperationError(f"Error appending entry to {filename}: {e}")
+            raise FileOperationError(
+                f"Error appending entry to {instruction_name}: {e}"
+            )
 
     """
     Manages VS Code .instructions.md files in the prompts directory.
@@ -126,12 +128,12 @@ class InstructionManager:
         instructions.sort(key=lambda x: x["name"].lower())
         return instructions
 
-    def get_instruction(self, filename: str) -> Dict[str, Any]:
+    def get_instruction(self, instruction_name: str) -> Dict[str, Any]:
         """
         Get content and metadata of a specific instruction file.
 
         Args:
-            filename: Name of the .instructions.md file
+            instruction_name: Name of the .instructions.md file
 
         Returns:
             Instruction data including frontmatter and content
@@ -141,20 +143,20 @@ class InstructionManager:
         """
 
         # Ensure filename has correct extension
-        if not filename.endswith(INSTRUCTION_FILE_EXTENSION):
-            filename += INSTRUCTION_FILE_EXTENSION
+        if not instruction_name.endswith(INSTRUCTION_FILE_EXTENSION):
+            instruction_name += INSTRUCTION_FILE_EXTENSION
 
-        file_path = self.prompts_dir / filename
+        file_path = self.prompts_dir / instruction_name
 
         if not file_path.exists():
-            raise FileOperationError(f"Instruction file not found: {filename}")
+            raise FileOperationError(f"Instruction file not found: {instruction_name}")
 
         try:
             frontmatter, content = parse_frontmatter_file(file_path)
 
             return {
-                "filename": filename,
-                "name": filename.replace(INSTRUCTION_FILE_EXTENSION, ""),
+                "instruction_name": instruction_name,
+                "name": instruction_name.replace(INSTRUCTION_FILE_EXTENSION, ""),
                 "path": str(file_path),
                 "description": frontmatter.get("description", ""),
                 "frontmatter": frontmatter,
@@ -164,14 +166,16 @@ class InstructionManager:
             }
 
         except Exception as e:
-            raise FileOperationError(f"Error reading instruction file {filename}: {e}")
+            raise FileOperationError(
+                f"Error reading instruction file {instruction_name}: {e}"
+            )
 
-    def get_raw_instruction(self, filename: str) -> str:
+    def get_raw_instruction(self, instruction_name: str) -> str:
         """
         Get the raw file content of a specific instruction file without any processing.
 
         Args:
-            filename: Name of the .instructions.md file
+            instruction_name: Name of the .instructions.md file
 
         Returns:
             Raw file content as string
@@ -181,13 +185,13 @@ class InstructionManager:
         """
 
         # Ensure filename has correct extension
-        if not filename.endswith(INSTRUCTION_FILE_EXTENSION):
-            filename += INSTRUCTION_FILE_EXTENSION
+        if not instruction_name.endswith(INSTRUCTION_FILE_EXTENSION):
+            instruction_name += INSTRUCTION_FILE_EXTENSION
 
-        file_path = self.prompts_dir / filename
+        file_path = self.prompts_dir / instruction_name
 
         if not file_path.exists():
-            raise FileOperationError(f"Instruction file not found: {filename}")
+            raise FileOperationError(f"Instruction file not found: {instruction_name}")
 
         try:
             with open(file_path, "r", encoding="utf-8") as f:
@@ -195,15 +199,17 @@ class InstructionManager:
 
         except Exception as e:
             raise FileOperationError(
-                f"Error reading raw instruction file {filename}: {e}"
+                f"Error reading raw instruction file {instruction_name}: {e}"
             )
 
-    def create_instruction(self, filename: str, description: str, content: str) -> bool:
+    def create_instruction(
+        self, instruction_name: str, description: str, content: str
+    ) -> bool:
         """
         Create a new instruction file.
 
         Args:
-            filename: Name for the new .instructions.md file
+            instruction_name: Name for the new .instructions.md file
             description: Description of the instruction
             content: Instruction content
 
@@ -215,13 +221,15 @@ class InstructionManager:
         """
 
         # Ensure filename has correct extension
-        if not filename.endswith(INSTRUCTION_FILE_EXTENSION):
-            filename += INSTRUCTION_FILE_EXTENSION
+        if not instruction_name.endswith(INSTRUCTION_FILE_EXTENSION):
+            instruction_name += INSTRUCTION_FILE_EXTENSION
 
-        file_path = self.prompts_dir / filename
+        file_path = self.prompts_dir / instruction_name
 
         if file_path.exists():
-            raise FileOperationError(f"Instruction file already exists: {filename}")
+            raise FileOperationError(
+                f"Instruction file already exists: {instruction_name}"
+            )
 
         # Create frontmatter with applyTo field so instructions are actually applied
         frontmatter: Dict[str, Any] = {"applyTo": "**", "description": description}
@@ -231,15 +239,17 @@ class InstructionManager:
                 file_path, frontmatter, content, create_backup=False
             )
             if success:
-                logger.info(f"Created instruction file: {filename}")
+                logger.info(f"Created instruction file: {instruction_name}")
             return success
 
         except Exception as e:
-            raise FileOperationError(f"Error creating instruction file {filename}: {e}")
+            raise FileOperationError(
+                f"Error creating instruction file {instruction_name}: {e}"
+            )
 
     def update_instruction(
         self,
-        filename: str,
+        instruction_name: str,
         frontmatter: Optional[Dict[str, Any]] = None,
         content: Optional[str] = None,
     ) -> bool:
@@ -249,7 +259,7 @@ class InstructionManager:
         This method is for full rewrites. To append to a section, use append_to_section.
 
         Args:
-            filename: Name of the .instructions.md file
+            instruction_name: Name of the .instructions.md file
             frontmatter: New frontmatter (optional)
             content: New content (optional, replaces all markdown content)
 
@@ -260,13 +270,13 @@ class InstructionManager:
             FileOperationError: If file cannot be updated
         """
         # Ensure filename has correct extension
-        if not filename.endswith(INSTRUCTION_FILE_EXTENSION):
-            filename += INSTRUCTION_FILE_EXTENSION
+        if not instruction_name.endswith(INSTRUCTION_FILE_EXTENSION):
+            instruction_name += INSTRUCTION_FILE_EXTENSION
 
-        file_path = self.prompts_dir / filename
+        file_path = self.prompts_dir / instruction_name
 
         if not file_path.exists():
-            raise FileOperationError(f"Instruction file not found: {filename}")
+            raise FileOperationError(f"Instruction file not found: {instruction_name}")
 
         try:
             # Read current content
@@ -286,18 +296,20 @@ class InstructionManager:
                 file_path, new_frontmatter, new_content, create_backup=True
             )
             if success:
-                logger.info(f"Updated instruction file with backup: {filename}")
+                logger.info(f"Updated instruction file with backup: {instruction_name}")
             return success
 
         except Exception as e:
-            raise FileOperationError(f"Error updating instruction file {filename}: {e}")
+            raise FileOperationError(
+                f"Error updating instruction file {instruction_name}: {e}"
+            )
 
-    def delete_instruction(self, filename: str) -> bool:
+    def delete_instruction(self, instruction_name: str) -> bool:
         """
         Delete an instruction file with automatic backup.
 
         Args:
-            filename: Name of the .instructions.md file
+            instruction_name: Name of the .instructions.md file
 
         Returns:
             True if successful
@@ -307,19 +319,21 @@ class InstructionManager:
         """
 
         # Ensure filename has correct extension
-        if not filename.endswith(INSTRUCTION_FILE_EXTENSION):
-            filename += INSTRUCTION_FILE_EXTENSION
+        if not instruction_name.endswith(INSTRUCTION_FILE_EXTENSION):
+            instruction_name += INSTRUCTION_FILE_EXTENSION
 
-        file_path = self.prompts_dir / filename
+        file_path = self.prompts_dir / instruction_name
 
         if not file_path.exists():
-            raise FileOperationError(f"Instruction file not found: {filename}")
+            raise FileOperationError(f"Instruction file not found: {instruction_name}")
 
         try:
             # Use safe delete which creates backup automatically
             safe_delete_file(file_path, create_backup=True)
-            logger.info(f"Deleted instruction file with backup: {filename}")
+            logger.info(f"Deleted instruction file with backup: {instruction_name}")
             return True
 
         except Exception as e:
-            raise FileOperationError(f"Error deleting instruction file {filename}: {e}")
+            raise FileOperationError(
+                f"Error deleting instruction file {instruction_name}: {e}"
+            )

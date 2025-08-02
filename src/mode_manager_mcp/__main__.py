@@ -63,6 +63,9 @@ def main() -> None:
         os.environ["MCP_CHATMODE_READ_ONLY"] = "true"
 
     # Create and run the server
+    from . import __version__
+
+    logging.info(f"Running version {__version__}")
     server = create_server(library_url=args.library_url)
 
     try:
