@@ -8,37 +8,25 @@ and handling cross-platform path operations.
 import logging
 import os
 import platform
+import types
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
-# For process inspection
-try:
-    import psutil
-except ImportError:
-    psutil = None
+import psutil
 
 
 def detect_vscode_variant() -> Optional[str]:
-    """
-    Detect if running inside VS Code Insiders or stable by inspecting parent process name.
-
-    Returns:
-        'insiders' if VS Code Insiders, 'stable' if VS Code stable, None otherwise
-    """
-    if psutil is None:
-        logger.warning(
-            "psutil not installed; cannot detect VS Code variant by process."
-        )
-        return None
+    # psutil is always present
     try:
         parent = psutil.Process(os.getppid())
         proc_name = parent.name().lower()
-        if "insiders" in proc_name:
-            return "insiders"
-        elif "code" in proc_name:
-            return "stable"
     except Exception as e:
         logger.error(f"Error detecting VS Code variant: {e}")
+        return None
+    if "insiders" in proc_name:
+        return "insiders"
+    elif "code" in proc_name:
+        return "stable"
     return None
 
 
