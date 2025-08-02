@@ -237,7 +237,14 @@ class InstructionManager:
             new_frontmatter = (
                 frontmatter if frontmatter is not None else current_frontmatter
             )
-            new_content = content if content is not None else current_content
+            # If new content is provided, append it to the bottom
+            if content is not None:
+                # Ensure current_content ends with a newline
+                if not current_content.endswith("\n"):
+                    current_content += "\n"
+                new_content = current_content + content
+            else:
+                new_content = current_content
 
             success = write_frontmatter_file(
                 file_path, new_frontmatter, new_content, create_backup=True
