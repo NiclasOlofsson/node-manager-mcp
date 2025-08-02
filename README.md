@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/niclasolofsson-mode-manager-mcp-badge.png)](https://mseep.ai/app/niclasolofsson-mode-manager-mcp)
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="logo-dark-theme.svg">
   <source media="(prefers-color-scheme: light)" srcset="logo-light-theme.svg">
