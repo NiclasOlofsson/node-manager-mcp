@@ -39,6 +39,7 @@ dev = [
     "black>=23.0.0",
     "mypy>=1.0.0",
     "pre-commit>=3.0.0",
+    "types-psutil"
 ]
 
 [project.urls]
@@ -61,8 +62,7 @@ packages = ["src/mode_manager_mcp"]
 [tool.hatch.envs.default]
 type = "virtual"
 path = ".venv"
-dependencies = ["pytest", "pytest-asyncio", "black", "mypy", "pre-commit"]
-
+dependencies = ["pytest", "pytest-asyncio", "black", "mypy", "pre-commit", "types-psutil"]
 [tool.hatch.envs.default.scripts]
 test = "pytest"
 lint = "black --check src tests/test_basic.py"
