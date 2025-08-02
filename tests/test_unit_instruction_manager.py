@@ -4,14 +4,16 @@ from mode_manager_mcp.instruction_manager import InstructionManager
 
 
 @pytest.fixture
-def prompts_dir(global_patch_and_tempdir):
+def prompts_dir(global_patch_and_tempdir: str) -> str:
     return global_patch_and_tempdir
+
 
 def test_instruction_manager_create_and_delete(prompts_dir: str) -> None:
     im = InstructionManager(prompts_dir=prompts_dir)
     filename = "unit_test.instructions.md"
     assert im.create_instruction(filename, "desc", "content") is True
     assert im.delete_instruction(filename) is True
+
 
 def test_instruction_manager_format_and_frontmatter(prompts_dir: str) -> None:
     im = InstructionManager(prompts_dir=prompts_dir)
