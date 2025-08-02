@@ -25,12 +25,13 @@ class LibraryManager:
     Manages the Mode Manager MCP Library for browsing and installing modes/instructions.
     """
 
-    def __init__(self, library_url: Optional[str] = None):
+    def __init__(self, library_url: Optional[str] = None, prompts_dir: Optional[str] = None):
         """
         Initialize the library manager.
 
         Args:
             library_url: URL to the library JSON file (defaults to the official Mode Manager MCP library)
+            prompts_dir: Custom prompts directory for all managers (optional)
         """
         # Default to the official Mode Manager MCP library in the GitHub repository
         self.library_url = (
@@ -38,8 +39,8 @@ class LibraryManager:
             or "https://raw.githubusercontent.com/NiclasOlofsson/node-manager-mcp/refs/heads/main/library/memory-mode-library.json"
         )
 
-        self.chatmode_manager = ChatModeManager()
-        self.instruction_manager = InstructionManager()
+        self.chatmode_manager = ChatModeManager(prompts_dir=prompts_dir)
+        self.instruction_manager = InstructionManager(prompts_dir=prompts_dir)
 
         logger.info(f"Library manager initialized with URL: {self.library_url}")
 

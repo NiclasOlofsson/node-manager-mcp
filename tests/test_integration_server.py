@@ -4,10 +4,10 @@ from fastmcp import Client
 from mode_manager_mcp.simple_server import ModeManagerServer
 
 
-# The session-scoped fixture in conftest.py handles all path/environment patching.
-@pytest.fixture(scope="module")
-def server() -> ModeManagerServer:
-    return ModeManagerServer()
+# The session-scoped fixture in conftest.py yields the temp prompts directory.
+@pytest.fixture()
+def server(global_patch_and_tempdir) -> ModeManagerServer:
+    return ModeManagerServer(prompts_dir=global_patch_and_tempdir)
 
 
 @pytest.mark.asyncio

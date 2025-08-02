@@ -33,11 +33,12 @@ class ModeManagerServer:
     Provides tools for managing VS Code .chatmode.md and .instructions.md files.
     """
 
-    def __init__(self, library_url: Optional[str] = None):
+    def __init__(self, library_url: Optional[str] = None, prompts_dir: Optional[str] = None):
         """Initialize the server.
 
         Args:
             library_url: Custom URL for the Mode Manager MCP Library (optional)
+            prompts_dir: Custom prompts directory for all managers (optional)
         """
         # FastMCP 2.11.0 initialization with recommended arguments
         self.app = FastMCP(
@@ -70,8 +71,8 @@ class ModeManagerServer:
             on_duplicate_prompts="replace",
             include_fastmcp_meta=True,  # Include FastMCP metadata for clients
         )
-        self.chatmode_manager = ChatModeManager()
-        self.instruction_manager = InstructionManager()
+        self.chatmode_manager = ChatModeManager(prompts_dir=prompts_dir)
+        self.instruction_manager = InstructionManager(prompts_dir=prompts_dir)
 
         # Allow library URL to be configured via parameter, environment variable, or use default
         final_library_url = (
@@ -79,7 +80,7 @@ class ModeManagerServer:
             or os.getenv("MCP_LIBRARY_URL")
             or "https://raw.githubusercontent.com/NiclasOlofsson/node-manager-mcp/refs/heads/main/library/memory-mode-library.json"
         )
-        self.library_manager = LibraryManager(library_url=final_library_url)
+        self.library_manager = LibraryManager(library_url=final_library_url, prompts_dir=prompts_dir)
 
         self.read_only = os.getenv("MCP_CHATMODE_READ_ONLY", "false").lower() == "true"
 
