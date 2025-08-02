@@ -25,6 +25,73 @@ INSTRUCTION_FILE_EXTENSION = ".instructions.md"
 
 
 class InstructionManager:
+    def append_to_section(
+        self,
+        filename: str,
+        section_header: str,
+        new_entry: str,
+    ) -> bool:
+        """
+        Append a new entry to a specific section in an instruction file.
+
+        Args:
+            filename: Name of the .instructions.md file
+            section_header: Section header to append to (e.g., '## Memories')
+            new_entry: Content to append (should include any formatting, e.g., '- ...')
+
+        Returns:
+            True if successful
+
+        Raises:
+            FileOperationError: If file cannot be updated
+        """
+        # Ensure filename has correct extension
+        if not filename.endswith(INSTRUCTION_FILE_EXTENSION):
+            filename += INSTRUCTION_FILE_EXTENSION
+
+        file_path = self.prompts_dir / filename
+
+        if not file_path.exists():
+            raise FileOperationError(f"Instruction file not found: {filename}")
+
+        try:
+            current_frontmatter, current_content = parse_frontmatter_file(file_path)
+            lines = current_content.splitlines()
+            section_start = None
+            for i, line in enumerate(lines):
+                if line.strip().lower() == section_header.strip().lower():
+                    section_start = i
+                    break
+
+            if section_start is not None:
+                # Find the end of the section (next section header or end of file)
+                insert_at = len(lines)
+                for j in range(section_start + 1, len(lines)):
+                    if lines[j].startswith("## "):
+                        insert_at = j
+                        break
+                # Remove trailing blank line before inserting if present
+                if insert_at > section_start + 1 and lines[insert_at - 1].strip() == "":
+                    del lines[insert_at - 1]
+                    insert_at -= 1
+                # Insert the new entry at the end of the section
+                lines.insert(insert_at, new_entry)
+                new_content = "\n".join(lines)
+                if not new_content.endswith("\n"):
+                    new_content += "\n"
+            else:
+                # If section does not exist, append at end
+                new_content = current_content.rstrip("\n") + f"\n{section_header}\n{new_entry}\n"
+
+            success = write_frontmatter_file(
+                file_path, current_frontmatter, new_content, create_backup=True
+            )
+            if success:
+                logger.info(f"Appended to section '{section_header}' in: {filename}")
+            return success
+
+        except Exception as e:
+            raise FileOperationError(f"Error appending to section '{section_header}' in {filename}: {e}")
     """
     Manages VS Code .instructions.md files in the prompts directory.
     """
@@ -206,12 +273,14 @@ class InstructionManager:
         content: Optional[str] = None,
     ) -> bool:
         """
-        Update an existing instruction file.
+        Replace the content and/or frontmatter of an instruction file.
+
+        This method is for full rewrites. To append to a section, use append_to_section.
 
         Args:
             filename: Name of the .instructions.md file
             frontmatter: New frontmatter (optional)
-            content: New content (optional)
+            content: New content (optional, replaces all markdown content)
 
         Returns:
             True if successful
@@ -219,7 +288,6 @@ class InstructionManager:
         Raises:
             FileOperationError: If file cannot be updated
         """
-
         # Ensure filename has correct extension
         if not filename.endswith(INSTRUCTION_FILE_EXTENSION):
             filename += INSTRUCTION_FILE_EXTENSION
@@ -237,12 +305,9 @@ class InstructionManager:
             new_frontmatter = (
                 frontmatter if frontmatter is not None else current_frontmatter
             )
-            # If new content is provided, append it to the bottom
+            # If new content is provided, replace all markdown content
             if content is not None:
-                # Ensure current_content ends with a newline
-                if not current_content.endswith("\n"):
-                    current_content += "\n"
-                new_content = current_content + content
+                new_content = content
             else:
                 new_content = current_content
 

@@ -382,20 +382,11 @@ class ModeManagerServer:
                     if not success:
                         return f"Error: Failed to create memory file at {memory_path}"
                     logger.info("Created new memory file for user")
-                current_memory = instruction_manager.get_instruction(memory_filename)
-                current_content = current_memory["content"]
                 timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
                 new_memory_entry = f"- **{timestamp}**: {memory_item}\n"
-                if "## Memories" in current_content:
-                    updated_content = current_content.replace(
-                        "## Memories\n", f"## Memories\n{new_memory_entry}"
-                    )
-                else:
-                    updated_content = (
-                        current_content + f"\n## Memories\n{new_memory_entry}"
-                    )
-                success = instruction_manager.update_instruction(
-                    memory_filename, content=updated_content
+                # Use the new append_to_section method to safely append
+                success = instruction_manager.append_to_section(
+                    memory_filename, section_header="## Memories", new_entry=new_memory_entry
                 )
                 if success:
                     return f"✅ Remembered: {memory_item}\n\n💡 This memory will be available to AI assistants when the memory instruction is active in VS Code."
