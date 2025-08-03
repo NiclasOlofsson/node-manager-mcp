@@ -2,6 +2,14 @@
 	"servers": {
 		"mode-manager": {
 			"command": "mode-manager-mcp"
-		}
+		},
+		// "memory": {
+		// 	"command": "pipx",
+		// 	"args": [
+		// 		"run",
+		// 		"mode-manager-mcp"
+		// 	],
+		// 	"gallery": true
+		// }
 	}
 }

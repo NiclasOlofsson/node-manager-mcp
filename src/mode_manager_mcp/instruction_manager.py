@@ -13,6 +13,7 @@ from typing import Any, Dict, List, Optional, Union
 from .path_utils import get_vscode_prompts_directory
 from .simple_file_ops import (
     FileOperationError,
+    parse_frontmatter,
     parse_frontmatter_file,
     safe_delete_file,
     write_frontmatter_file,
@@ -281,6 +282,10 @@ class InstructionManager:
         try:
             # Read current content
             current_frontmatter, current_content = parse_frontmatter_file(file_path)
+
+            if content is not None and frontmatter is None:
+                # We check if the content is actually including yaml
+                frontmatter, content = parse_frontmatter(content)
 
             # Use provided values or keep current ones
             new_frontmatter = (

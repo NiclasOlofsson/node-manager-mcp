@@ -40,6 +40,11 @@ def parse_frontmatter_file(file_path: Union[str, Path]) -> Tuple[Dict[str, Any],
     except Exception as e:
         raise FileOperationError(f"Could not read file {file_path}: {e}")
 
+    return parse_frontmatter(content)
+
+
+def parse_frontmatter(content: str) -> Tuple[Dict[str, Any], str]:
+
     # Check for frontmatter
     if not content.startswith("---\n"):
         # No frontmatter, return empty dict and full content
@@ -97,7 +102,7 @@ def parse_frontmatter_file(file_path: Union[str, Path]) -> Tuple[Dict[str, Any],
         return frontmatter, body_content
 
     except Exception as e:
-        logger.warning(f"Error parsing frontmatter in {file_path}: {e}")
+        logger.warning(f"Error parsing frontmatter: {e}")
         return {}, content
 
 
