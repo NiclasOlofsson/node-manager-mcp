@@ -10,8 +10,12 @@
 
 Perfect timing for 2025: VS Code now loads instructions with every message. This tool gives Copilot **persistent memory** across all your conversations.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_Server-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=modemanager&config=%7B%22command%22%3A%22pipx%22%2C%22args%22%3A%5B%22run%22%2C%22mode-manager-mcp%22%5D%7D)
+[![Install in VS Code Insiders](https://img.shields.io/badge/VS_Code_Insiders-Install_Server-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=modemanager&config=%7B%22command%22%3A%22pipx%22%2C%22args%22%3A%5B%22run%22%2C%22mode-manager-mcp%22%5D%7D&quality=insiders)
+&nbsp;&nbsp;&nbsp;&nbsp;[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.8+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+
+*If you are missing `python` or `pipx` you better [do this first!](#get-it-running-2-minutes)*
 
 ## Why This Matters Now
 
@@ -65,21 +69,32 @@ Beyond memory, this tool also manages your VS Code prompt ecosystem:
 
 ## Get It Running (2 Minutes)
 
-### 1. Install from PyPI
-```bash
-pip install mode-manager-mcp
-```
+*If you don't even have `python`, you need to install that first. You can get it at [python.org/downloads](https://www.python.org/downloads/)*
 
-### 2. Add to VS Code
+### 1. Install pipx from PyPI
+```bash
+pip install pipx
+```
+### 2. Click on the bade for your VS Code
+
+[![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_Server-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=modemanager&config=%7B%22command%22%3A%22pipx%22%2C%22args%22%3A%5B%22run%22%2C%22mode-manager-mcp%22%5D%7D)
+[![Install in VS Code Insiders](https://img.shields.io/badge/VS_Code_Insiders-Install_Server-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=modemanager&config=%7B%22command%22%3A%22pipx%22%2C%22args%22%3A%5B%22run%22%2C%22mode-manager-mcp%22%5D%7D&quality=insiders)
+
+### .. Or manually add it to your VS Code
 Add this to your VS Code MCP settings (`mcp.json`):
 ```json
 {
   "servers": {
     "mode-manager": {
-      "command": "mode-manager-mcp"
+      "command": "pipx",
+      "args": [
+        "run",
+        "mode-manager-mcp"
+      ]
     }
   }
 }
+
 ```
 
 That's it! Start chatting with Copilot and use: *"Remember that..."*
