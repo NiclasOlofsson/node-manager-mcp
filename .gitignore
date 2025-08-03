@@ -152,12 +152,12 @@ cython_debug/
 .idea/
 
 # VS Code
+
 .vscode/settings.json
 .vscode/launch.json
 .vscode/extensions.json
 .vscode/tasks.json
-# Keep the mcp.json configuration file
-!.vscode/mcp.json
+.vscode/mcp.json
 
 # Keep assets and images
 !assets/
