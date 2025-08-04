@@ -123,6 +123,8 @@ class ModeManagerServer:
             logger.info("Running in READ-ONLY mode")
 
     def _register_tools(self) -> None:
+        from typing import Annotated
+        from pydantic import Field
 
         @self.app.prompt(
             name="onboarding",
@@ -183,13 +185,25 @@ description: Personal AI memory for conversations and preferences
                 "idempotentHint": False,
                 "readOnlyHint": False,
                 "title": "Delete Chatmode",
+                "parameters": {
+                    "filename": "The filename of the chatmode to delete. If a full filename is provided, it will be used as-is. Otherwise, .chatmode.md will be appended automatically. You can provide just the name (e.g. my-chatmode) or the full filename (e.g. my-chatmode.chatmode.md)."
+                },
+                "returns": "Returns a success message if the chatmode was deleted, or an error message if the operation failed or the file was not found.",
             },
             meta={
                 "category": "chatmode",
                 "version": "1.0",
             },
         )
-        def delete_chatmode(filename: str) -> str:
+        def delete_chatmode(
+            filename: Annotated[
+                str,
+                Field(
+                    description="The filename of the chatmode to delete (with or without extension)"
+                ),
+            ],
+        ) -> str:
+            """Delete a VS Code .chatmode.md file from the prompts directory."""
             if read_only:
                 return "Error: Server is running in read-only mode"
             try:
@@ -209,13 +223,25 @@ description: Personal AI memory for conversations and preferences
                 "idempotentHint": False,
                 "readOnlyHint": False,
                 "title": "Update Chatmode from Source",
+                "parameters": {
+                    "filename": "The filename of the chatmode to update from its source. If .chatmode.md extension is not provided, it will be added automatically."
+                },
+                "returns": "Returns a success message if the chatmode was updated from source, or an error message. Note: This feature is currently not implemented.",
             },
             meta={
                 "category": "chatmode",
                 "version": "1.0",
             },
         )
-        def update_chatmode_from_source(filename: str) -> str:
+        def update_chatmode_from_source(
+            filename: Annotated[
+                str,
+                Field(
+                    description="The filename of the chatmode to update from source (with or without extension)"
+                ),
+            ],
+        ) -> str:
+            """Update a .chatmode.md file from its source definition."""
             return "Not implemented"
 
         @self.app.tool(
@@ -226,6 +252,13 @@ description: Personal AI memory for conversations and preferences
                 "idempotentHint": False,
                 "readOnlyHint": False,
                 "title": "Create Chatmode",
+                "parameters": {
+                    "filename": "The filename for the new chatmode. If .chatmode.md extension is not provided, it will be added automatically.",
+                    "description": "A brief description of what this chatmode does. This will be stored in the frontmatter.",
+                    "content": "The main content/instructions for the chatmode in markdown format.",
+                    "tools": "Optional comma-separated list of tool names that this chatmode should have access to.",
+                },
+                "returns": "Returns a success message if the chatmode was created, or an error message if the operation failed.",
             },
             meta={
                 "category": "chatmode",
@@ -233,8 +266,27 @@ description: Personal AI memory for conversations and preferences
             },
         )
         def create_chatmode(
-            filename: str, description: str, content: str, tools: Optional[str] = None
+            filename: Annotated[
+                str,
+                Field(
+                    description="The filename for the new chatmode (with or without extension)"
+                ),
+            ],
+            description: Annotated[
+                str, Field(description="A brief description of what this chatmode does")
+            ],
+            content: Annotated[
+                str,
+                Field(
+                    description="The main content/instructions for the chatmode in markdown format"
+                ),
+            ],
+            tools: Annotated[
+                Optional[str],
+                Field(description="Optional comma-separated list of tool names"),
+            ] = None,
         ) -> str:
+            """Create a new VS Code .chatmode.md file with the specified description, content, and tools."""
             if read_only:
                 return "Error: Server is running in read-only mode"
             try:
@@ -257,6 +309,13 @@ description: Personal AI memory for conversations and preferences
                 "idempotentHint": False,
                 "readOnlyHint": False,
                 "title": "Update Chatmode",
+                "parameters": {
+                    "filename": "The filename of the chatmode to update. If .chatmode.md extension is not provided, it will be added automatically.",
+                    "description": "Optional new description for the chatmode. If not provided, the existing description will be kept.",
+                    "content": "Optional new content for the chatmode. If not provided, the existing content will be kept.",
+                    "tools": "Optional new comma-separated list of tool names. If not provided, the existing tools will be kept.",
+                },
+                "returns": "Returns a success message if the chatmode was updated, or an error message if the operation failed.",
             },
             meta={
                 "category": "chatmode",
@@ -264,11 +323,26 @@ description: Personal AI memory for conversations and preferences
             },
         )
         def update_chatmode(
-            filename: str,
-            description: Optional[str] = None,
-            content: Optional[str] = None,
-            tools: Optional[str] = None,
+            filename: Annotated[
+                str,
+                Field(
+                    description="The filename of the chatmode to update (with or without extension)"
+                ),
+            ],
+            description: Annotated[
+                Optional[str],
+                Field(description="Optional new description for the chatmode"),
+            ] = None,
+            content: Annotated[
+                Optional[str],
+                Field(description="Optional new content for the chatmode"),
+            ] = None,
+            tools: Annotated[
+                Optional[str],
+                Field(description="Optional new comma-separated list of tool names"),
+            ] = None,
         ) -> str:
+            """Update an existing VS Code .chatmode.md file with new description, content, or tools."""
             if read_only:
                 return "Error: Server is running in read-only mode"
             try:
@@ -295,6 +369,7 @@ description: Personal AI memory for conversations and preferences
                 "idempotentHint": True,
                 "readOnlyHint": True,
                 "title": "List Chatmodes",
+                "returns": "Returns a formatted list of all chatmode files with their names, descriptions, sizes, and content previews. If no chatmodes are found, returns an informational message.",
             },
             meta={
                 "category": "chatmode",
@@ -302,6 +377,7 @@ description: Personal AI memory for conversations and preferences
             },
         )
         def list_chatmodes() -> str:
+            """List all VS Code .chatmode.md files in the prompts directory."""
             try:
                 chatmodes = chatmode_manager.list_chatmodes()
                 if not chatmodes:
@@ -328,13 +404,25 @@ description: Personal AI memory for conversations and preferences
                 "idempotentHint": True,
                 "readOnlyHint": True,
                 "title": "Get Chatmode",
+                "parameters": {
+                    "filename": "The filename of the chatmode to retrieve. If a full filename is provided, it will be used as-is. Otherwise, .chatmode.md will be appended automatically. You can provide just the name (e.g. my-chatmode) or the full filename (e.g. my-chatmode.chatmode.md)."
+                },
+                "returns": "Returns the raw markdown content of the specified chatmode file, or an error message if not found. Display recommendation: If the file is longer than 40 lines, show the first 10 lines, then '........', then the last 10 lines.",
             },
             meta={
                 "category": "chatmode",
                 "version": "1.0",
             },
         )
-        def get_chatmode(filename: str) -> str:
+        def get_chatmode(
+            filename: Annotated[
+                str,
+                Field(
+                    description="The filename of the chatmode to retrieve (with or without extension)"
+                ),
+            ],
+        ) -> str:
+            """Get the raw content of a VS Code .chatmode.md file."""
             try:
                 if not filename.endswith(".chatmode.md"):
                     filename += ".chatmode.md"
@@ -351,13 +439,35 @@ description: Personal AI memory for conversations and preferences
                 "idempotentHint": False,
                 "readOnlyHint": False,
                 "title": "Create Instruction",
+                "parameters": {
+                    "filename": "The filename for the new instruction. If .instructions.md extension is not provided, it will be added automatically.",
+                    "description": "A brief description of what this instruction does. This will be stored in the frontmatter.",
+                    "content": "The main content/instructions in markdown format.",
+                },
+                "returns": "Returns a success message if the instruction was created, or an error message if the operation failed.",
             },
             meta={
                 "category": "instruction",
                 "version": "1.0",
             },
         )
-        def create_instruction(filename: str, description: str, content: str) -> str:
+        def create_instruction(
+            filename: Annotated[
+                str,
+                Field(
+                    description="The filename for the new instruction (with or without extension)"
+                ),
+            ],
+            description: Annotated[
+                str,
+                Field(description="A brief description of what this instruction does"),
+            ],
+            content: Annotated[
+                str,
+                Field(description="The main content/instructions in markdown format"),
+            ],
+        ) -> str:
+            """Create a new VS Code .instructions.md file with the specified description and content."""
             if read_only:
                 return "Error: Server is running in read-only mode"
             try:
@@ -379,6 +489,12 @@ description: Personal AI memory for conversations and preferences
                 "idempotentHint": False,
                 "readOnlyHint": False,
                 "title": "Update Instruction",
+                "parameters": {
+                    "filename": "The filename of the instruction to update. If .instructions.md extension is not provided, it will be added automatically.",
+                    "description": "Optional new description for the instruction. If not provided, the existing description will be kept.",
+                    "content": "Optional new content for the instruction. If not provided, the existing content will be kept.",
+                },
+                "returns": "Returns a success message if the instruction was updated, or an error message if the operation failed.",
             },
             meta={
                 "category": "instruction",
@@ -386,10 +502,22 @@ description: Personal AI memory for conversations and preferences
             },
         )
         def update_instruction(
-            filename: str,
-            description: Optional[str] = None,
-            content: Optional[str] = None,
+            filename: Annotated[
+                str,
+                Field(
+                    description="The filename of the instruction to update (with or without extension)"
+                ),
+            ],
+            description: Annotated[
+                Optional[str],
+                Field(description="Optional new description for the instruction"),
+            ] = None,
+            content: Annotated[
+                Optional[str],
+                Field(description="Optional new content for the instruction"),
+            ] = None,
         ) -> str:
+            """Update an existing VS Code .instructions.md file with new description or content."""
             if read_only:
                 return "Error: Server is running in read-only mode"
             try:
@@ -411,13 +539,25 @@ description: Personal AI memory for conversations and preferences
                 "idempotentHint": False,
                 "readOnlyHint": False,
                 "title": "Delete Instruction",
+                "parameters": {
+                    "filename": "The filename of the instruction to delete. If a full filename is provided, it will be used as-is. Otherwise, .instructions.md will be appended automatically. You can provide just the name (e.g. my-instruction) or the full filename (e.g. my-instruction.instructions.md)."
+                },
+                "returns": "Returns a success message if the instruction was deleted, or an error message if the operation failed or the file was not found.",
             },
             meta={
                 "category": "instruction",
                 "version": "1.0",
             },
         )
-        def delete_instruction(filename: str) -> str:
+        def delete_instruction(
+            filename: Annotated[
+                str,
+                Field(
+                    description="The filename of the instruction to delete (with or without extension)"
+                ),
+            ],
+        ) -> str:
+            """Delete a VS Code .instructions.md file from the prompts directory."""
             if read_only:
                 return "Error: Server is running in read-only mode"
             try:
@@ -437,10 +577,12 @@ description: Personal AI memory for conversations and preferences
                 "idempotentHint": True,
                 "readOnlyHint": True,
                 "title": "Refresh Library",
+                "returns": "Returns information about the library refresh operation, including library name, version, last updated date, and counts of available chatmodes and instructions. Also provides usage instructions.",
             },
             meta={"category": "library", "version": "1.0", "author": "Oatly Data Team"},
         )
         def refresh_library() -> str:
+            """Refresh the Mode Manager MCP Library from its source URL."""
             try:
                 result = library_manager.refresh_library()
                 if result["status"] == "success":
@@ -466,10 +608,12 @@ description: Personal AI memory for conversations and preferences
                 "idempotentHint": True,
                 "readOnlyHint": True,
                 "title": "Get Prompts Directory",
+                "returns": "Returns the absolute path to the VS Code prompts directory where .chatmode.md and .instructions.md files are stored.",
             },
             meta={"category": "prompts", "version": "1.0", "author": "Oatly Data Team"},
         )
         def get_prompts_directory() -> str:
+            """Get the path to the VS Code prompts directory."""
             try:
                 return str(instruction_manager.prompts_dir)
             except Exception as e:
@@ -483,6 +627,7 @@ description: Personal AI memory for conversations and preferences
                 "idempotentHint": True,
                 "readOnlyHint": True,
                 "title": "List Instructions",
+                "returns": "Returns a formatted list of all instruction files with their names, descriptions, sizes, and content previews. If no instructions are found, returns an informational message.",
             },
             meta={
                 "category": "instruction",
@@ -490,6 +635,7 @@ description: Personal AI memory for conversations and preferences
             },
         )
         def list_instructions() -> str:
+            """List all VS Code .instructions.md files in the prompts directory."""
             try:
                 instructions = instruction_manager.list_instructions()
                 if not instructions:
@@ -509,10 +655,6 @@ description: Personal AI memory for conversations and preferences
                 return result
             except Exception as e:
                 return f"Error listing VS Code instructions: {str(e)}"
-
-        from typing import Annotated
-
-        from pydantic import Field
 
         @self.app.tool(
             name="get_instruction",
@@ -567,10 +709,19 @@ description: Personal AI memory for conversations and preferences
                 "idempotentHint": True,
                 "readOnlyHint": False,
                 "title": "Remember",
+                "parameters": {
+                    "memory_item": "The information to remember. This will be timestamped and appended to your memory.instructions.md file. The memory file will be created automatically if it doesn't exist."
+                },
+                "returns": "Returns a confirmation message that the memory item has been stored, or an error message if the operation failed.",
             },
             meta={"category": "memory", "version": "1.0", "author": "Oatly Data Team"},
         )
-        async def remember(memory_item: Optional[str] = None) -> str:
+        async def remember(
+            memory_item: Annotated[
+                Optional[str], Field(description="The information to remember")
+            ] = None,
+        ) -> str:
+            """Store a memory item in your personal AI memory for future conversations."""
             if read_only:
                 return "Error: Server is running in read-only mode"
             if memory_item is None:
@@ -610,12 +761,23 @@ description: Personal AI memory for conversations and preferences
                 "idempotentHint": True,
                 "readOnlyHint": True,
                 "title": "Browse Mode Library",
+                "parameters": {
+                    "category": "Optional category filter to show only items from a specific category. Use list without filter to see available categories.",
+                    "search": "Optional search term to filter items by name, description, or tags.",
+                },
+                "returns": "Returns a formatted list of available chatmodes and instructions from the library, with details like name, author, description, category, and installation name. Also shows available categories and usage instructions.",
             },
             meta={"category": "library", "version": "1.0", "author": "Oatly Data Team"},
         )
         def browse_mode_library(
-            category: Optional[str] = None, search: Optional[str] = None
+            category: Annotated[
+                Optional[str], Field(description="Optional category filter")
+            ] = None,
+            search: Annotated[
+                Optional[str], Field(description="Optional search term")
+            ] = None,
         ) -> str:
+            """Browse the Mode Manager MCP Library and filter by category or search term."""
             try:
                 library_data = library_manager.browse_library(
                     category=category, search=search
@@ -688,10 +850,25 @@ description: Personal AI memory for conversations and preferences
                 "idempotentHint": False,
                 "readOnlyHint": False,
                 "title": "Install from Library",
+                "parameters": {
+                    "name": "The name of the chatmode or instruction to install from the library. Use browse_mode_library() to see available items.",
+                    "filename": "Optional custom filename for the installed item. If not provided, the default filename from the library will be used.",
+                },
+                "returns": "Returns a success message with details about the installed item (filename, source URL, type), or an error message if the installation failed.",
             },
             meta={"category": "library", "version": "1.0", "author": "Oatly Data Team"},
         )
-        def install_from_library(name: str, filename: Optional[str] = None) -> str:
+        def install_from_library(
+            name: Annotated[
+                str,
+                Field(description="The name of the item to install from the library"),
+            ],
+            filename: Annotated[
+                Optional[str],
+                Field(description="Optional custom filename for the installed item"),
+            ] = None,
+        ) -> str:
+            """Install a chatmode or instruction from the Mode Manager MCP Library."""
             if read_only:
                 return "Error: Server is running in read-only mode"
             try:
