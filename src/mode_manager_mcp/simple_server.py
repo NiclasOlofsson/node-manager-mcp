@@ -174,7 +174,6 @@ description: Personal AI memory for conversations and preferences
             meta={
                 "category": "chatmode",
                 "version": "1.0",
-                "author": "Oatly Data Team",
             },
         )
         def delete_chatmode(filename: str) -> str:
@@ -201,7 +200,6 @@ description: Personal AI memory for conversations and preferences
             meta={
                 "category": "chatmode",
                 "version": "1.0",
-                "author": "Oatly Data Team",
             },
         )
         def update_chatmode_from_source(filename: str) -> str:
@@ -219,7 +217,6 @@ description: Personal AI memory for conversations and preferences
             meta={
                 "category": "chatmode",
                 "version": "1.0",
-                "author": "Oatly Data Team",
             },
         )
         def create_chatmode(
@@ -251,7 +248,6 @@ description: Personal AI memory for conversations and preferences
             meta={
                 "category": "chatmode",
                 "version": "1.0",
-                "author": "Oatly Data Team",
             },
         )
         def update_chatmode(
@@ -290,7 +286,6 @@ description: Personal AI memory for conversations and preferences
             meta={
                 "category": "chatmode",
                 "version": "1.0",
-                "author": "Oatly Data Team",
             },
         )
         def list_chatmodes() -> str:
@@ -324,7 +319,6 @@ description: Personal AI memory for conversations and preferences
             meta={
                 "category": "chatmode",
                 "version": "1.0",
-                "author": "Oatly Data Team",
             },
         )
         def get_chatmode(filename: str) -> str:
@@ -348,7 +342,6 @@ description: Personal AI memory for conversations and preferences
             meta={
                 "category": "instruction",
                 "version": "1.0",
-                "author": "Oatly Data Team",
             },
         )
         def create_instruction(filename: str, description: str, content: str) -> str:
@@ -377,7 +370,6 @@ description: Personal AI memory for conversations and preferences
             meta={
                 "category": "instruction",
                 "version": "1.0",
-                "author": "Oatly Data Team",
             },
         )
         def update_instruction(
@@ -410,7 +402,6 @@ description: Personal AI memory for conversations and preferences
             meta={
                 "category": "instruction",
                 "version": "1.0",
-                "author": "Oatly Data Team",
             },
         )
         def delete_instruction(filename: str) -> str:
@@ -483,7 +474,6 @@ description: Personal AI memory for conversations and preferences
             meta={
                 "category": "instruction",
                 "version": "1.0",
-                "author": "Oatly Data Team",
             },
         )
         def list_instructions() -> str:
@@ -519,7 +509,6 @@ description: Personal AI memory for conversations and preferences
             meta={
                 "category": "instruction",
                 "version": "1.0",
-                "author": "Oatly Data Team",
             },
         )
         def get_instruction(filename: str) -> str:
