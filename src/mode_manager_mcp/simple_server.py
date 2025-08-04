@@ -10,11 +10,15 @@ import json
 import logging
 import os
 import sys
-from typing import Optional
+from typing import Annotated, Optional
 
 from fastmcp import Context, FastMCP
 from fastmcp.prompts.prompt import Message
-from pydantic import BaseModel
+from fastmcp.server.middleware.error_handling import ErrorHandlingMiddleware
+from fastmcp.server.middleware.logging import LoggingMiddleware
+from fastmcp.server.middleware.rate_limiting import RateLimitingMiddleware
+from fastmcp.server.middleware.timing import TimingMiddleware
+from pydantic import BaseModel, Field
 
 from .chatmode_manager import ChatModeManager
 from .instruction_manager import INSTRUCTION_FILE_EXTENSION, InstructionManager
@@ -102,11 +106,6 @@ class ModeManagerServer:
         self.read_only = os.getenv("MCP_CHATMODE_READ_ONLY", "false").lower() == "true"
 
         # Add built-in FastMCP middleware (2.11.0)
-        from fastmcp.server.middleware.error_handling import ErrorHandlingMiddleware
-        from fastmcp.server.middleware.logging import LoggingMiddleware
-        from fastmcp.server.middleware.rate_limiting import RateLimitingMiddleware
-        from fastmcp.server.middleware.timing import TimingMiddleware
-
         self.app.add_middleware(ErrorHandlingMiddleware())  # Handle errors first
         self.app.add_middleware(RateLimitingMiddleware(max_requests_per_second=50))
         self.app.add_middleware(TimingMiddleware())  # Time actual execution
@@ -123,9 +122,6 @@ class ModeManagerServer:
             logger.info("Running in READ-ONLY mode")
 
     def _register_tools(self) -> None:
-        from typing import Annotated
-        from pydantic import Field
-
         @self.app.prompt(
             name="onboarding",
             description="Direct onboarding instructions for Copilot, including memory file structure.",
@@ -440,7 +436,7 @@ description: Personal AI memory for conversations and preferences
                 "readOnlyHint": False,
                 "title": "Create Instruction",
                 "parameters": {
-                    "filename": "The filename for the new instruction. If .instructions.md extension is not provided, it will be added automatically.",
+                    "instruction_name": "The name for the new instruction. If .instructions.md extension is not provided, it will be added automatically.",
                     "description": "A brief description of what this instruction does. This will be stored in the frontmatter.",
                     "content": "The main content/instructions in markdown format.",
                 },
@@ -452,10 +448,10 @@ description: Personal AI memory for conversations and preferences
             },
         )
         def create_instruction(
-            filename: Annotated[
+            instruction_name: Annotated[
                 str,
                 Field(
-                    description="The filename for the new instruction (with or without extension)"
+                    description="The name for the new instruction (with or without extension)"
                 ),
             ],
             description: Annotated[
@@ -472,14 +468,18 @@ description: Personal AI memory for conversations and preferences
                 return "Error: Server is running in read-only mode"
             try:
                 success = instruction_manager.create_instruction(
-                    filename, description, content
+                    instruction_name, description, content
                 )
                 if success:
-                    return f"Successfully created VS Code instruction: {filename}"
+                    return (
+                        f"Successfully created VS Code instruction: {instruction_name}"
+                    )
                 else:
-                    return f"Failed to create VS Code instruction: {filename}"
+                    return f"Failed to create VS Code instruction: {instruction_name}"
             except Exception as e:
-                return f"Error creating VS Code instruction '{filename}': {str(e)}"
+                return (
+                    f"Error creating VS Code instruction '{instruction_name}': {str(e)}"
+                )
 
         @self.app.tool(
             name="update_instruction",
@@ -490,7 +490,7 @@ description: Personal AI memory for conversations and preferences
                 "readOnlyHint": False,
                 "title": "Update Instruction",
                 "parameters": {
-                    "filename": "The filename of the instruction to update. If .instructions.md extension is not provided, it will be added automatically.",
+                    "instruction_name": "The name of the instruction to update. If .instructions.md extension is not provided, it will be added automatically.",
                     "description": "Optional new description for the instruction. If not provided, the existing description will be kept.",
                     "content": "Optional new content for the instruction. If not provided, the existing content will be kept.",
                 },
@@ -502,10 +502,10 @@ description: Personal AI memory for conversations and preferences
             },
         )
         def update_instruction(
-            filename: Annotated[
+            instruction_name: Annotated[
                 str,
                 Field(
-                    description="The filename of the instruction to update (with or without extension)"
+                    description="The name of the instruction to update (with or without extension)"
                 ),
             ],
             description: Annotated[
@@ -522,14 +522,18 @@ description: Personal AI memory for conversations and preferences
                 return "Error: Server is running in read-only mode"
             try:
                 success = instruction_manager.update_instruction(
-                    filename, content=content
+                    instruction_name, content=content
                 )
                 if success:
-                    return f"Successfully updated VS Code instruction: {filename}"
+                    return (
+                        f"Successfully updated VS Code instruction: {instruction_name}"
+                    )
                 else:
-                    return f"Failed to update VS Code instruction: {filename}"
+                    return f"Failed to update VS Code instruction: {instruction_name}"
             except Exception as e:
-                return f"Error updating VS Code instruction '{filename}': {str(e)}"
+                return (
+                    f"Error updating VS Code instruction '{instruction_name}': {str(e)}"
+                )
 
         @self.app.tool(
             name="delete_instruction",
@@ -540,7 +544,7 @@ description: Personal AI memory for conversations and preferences
                 "readOnlyHint": False,
                 "title": "Delete Instruction",
                 "parameters": {
-                    "filename": "The filename of the instruction to delete. If a full filename is provided, it will be used as-is. Otherwise, .instructions.md will be appended automatically. You can provide just the name (e.g. my-instruction) or the full filename (e.g. my-instruction.instructions.md)."
+                    "instruction_name": "The name of the instruction to delete. If a full filename is provided, it will be used as-is. Otherwise, .instructions.md will be appended automatically. You can provide just the name (e.g. my-instruction) or the full filename (e.g. my-instruction.instructions.md)."
                 },
                 "returns": "Returns a success message if the instruction was deleted, or an error message if the operation failed or the file was not found.",
             },
@@ -550,10 +554,10 @@ description: Personal AI memory for conversations and preferences
             },
         )
         def delete_instruction(
-            filename: Annotated[
+            instruction_name: Annotated[
                 str,
                 Field(
-                    description="The filename of the instruction to delete (with or without extension)"
+                    description="The name of the instruction to delete (with or without extension)"
                 ),
             ],
         ) -> str:
@@ -561,13 +565,17 @@ description: Personal AI memory for conversations and preferences
             if read_only:
                 return "Error: Server is running in read-only mode"
             try:
-                success = instruction_manager.delete_instruction(filename)
+                success = instruction_manager.delete_instruction(instruction_name)
                 if success:
-                    return f"Successfully deleted VS Code instruction: {filename}"
+                    return (
+                        f"Successfully deleted VS Code instruction: {instruction_name}"
+                    )
                 else:
-                    return f"Failed to delete VS Code instruction: {filename}"
+                    return f"Failed to delete VS Code instruction: {instruction_name}"
             except Exception as e:
-                return f"Error deleting VS Code instruction '{filename}': {str(e)}"
+                return (
+                    f"Error deleting VS Code instruction '{instruction_name}': {str(e)}"
+                )
 
         @self.app.tool(
             name="refresh_library",
@@ -727,8 +735,6 @@ description: Personal AI memory for conversations and preferences
             if memory_item is None:
                 return "Error: No memory item provided."
             try:
-                import datetime
-
                 memory_filename = f"memory{INSTRUCTION_FILE_EXTENSION}"
                 memory_path = instruction_manager.prompts_dir / memory_filename
                 if not memory_path.exists():

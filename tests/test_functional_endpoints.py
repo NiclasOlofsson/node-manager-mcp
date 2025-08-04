@@ -49,7 +49,7 @@ async def test_create_instruction_endpoint(server: ModeManagerServer) -> None:
         result = await client.call_tool(
             "create_instruction",
             {
-                "filename": "func_test.instructions.md",
+                "instruction_name": "func_test.instructions.md",
                 "description": "desc",
                 "content": "content",
             },
@@ -63,7 +63,7 @@ async def test_create_instruction_endpoint(server: ModeManagerServer) -> None:
 async def test_delete_instruction_endpoint(server: ModeManagerServer) -> None:
     async with Client(server.app) as client:
         result = await client.call_tool(
-            "delete_instruction", {"filename": "func_test.instructions.md"}
+            "delete_instruction", {"instruction_name": "func_test.instructions.md"}
         )
         assert "Successfully deleted" in result.data or "Successfully deleted" in str(
             result
