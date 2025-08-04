@@ -29,7 +29,7 @@ def test_instruction_manager_format_and_frontmatter(prompts_dir: str) -> None:
 
     # Check frontmatter keys
     assert "applyTo" in frontmatter
-    assert frontmatter["applyTo"] == "**"
+    assert frontmatter["applyTo"] == "'**'"
     assert "description" in frontmatter
     assert frontmatter["description"] == description
 

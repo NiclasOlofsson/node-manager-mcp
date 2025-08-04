@@ -15,7 +15,7 @@ from typing import Any, Dict, List, Optional, Union
 
 from .chatmode_manager import ChatModeManager
 from .instruction_manager import INSTRUCTION_FILE_EXTENSION, InstructionManager
-from .simple_file_ops import FileOperationError
+from .simple_file_ops import FileOperationError, parse_frontmatter
 
 logger = logging.getLogger(__name__)
 
@@ -251,53 +251,40 @@ class LibraryManager:
 
                 from .simple_file_ops import parse_frontmatter_file
 
-                # Write to temp file to parse
-                with tempfile.NamedTemporaryFile(
-                    mode="w", suffix=".chatmode.md", delete=False, encoding="utf-8"
-                ) as tmp:
-                    tmp.write(file_content)
-                    tmp_path = tmp.name
+                frontmatter, content_text = parse_frontmatter(file_content)
 
-                try:
-                    frontmatter, content_text = parse_frontmatter_file(tmp_path)
+                # Create the chatmode
+                success = self.chatmode_manager.create_chatmode(
+                    filename,
+                    frontmatter.get("description", item_data.get("description", "")),
+                    content_text,
+                    frontmatter.get("tools", []),
+                )
 
-                    # Create the chatmode
-                    success = self.chatmode_manager.create_chatmode(
+                if success:
+                    # Add source_url to track origin
+                    updated_frontmatter = frontmatter.copy()
+                    updated_frontmatter["source_url"] = content_url
+                    updated_frontmatter["library_source"] = name
+
+                    self.chatmode_manager.update_chatmode(
                         filename,
-                        frontmatter.get(
-                            "description", item_data.get("description", "")
-                        ),
-                        content_text,
-                        frontmatter.get("tools", []),
+                        frontmatter=updated_frontmatter,
+                        content=content_text,
                     )
 
-                    if success:
-                        # Add source_url to track origin
-                        updated_frontmatter = frontmatter.copy()
-                        updated_frontmatter["source_url"] = content_url
-                        updated_frontmatter["library_source"] = name
-
-                        self.chatmode_manager.update_chatmode(
-                            filename,
-                            frontmatter=updated_frontmatter,
-                            content=content_text,
-                        )
-
-                        return {
-                            "status": "success",
-                            "type": "chatmode",
-                            "name": name,
-                            "filename": filename,
-                            "source_url": content_url,
-                            "message": f"Successfully installed chatmode '{name}' as {filename}",
-                        }
-                    else:
-                        raise FileOperationError(
-                            f"Failed to create chatmode file: {filename}"
-                        )
-
-                finally:
-                    Path(tmp_path).unlink(missing_ok=True)
+                    return {
+                        "status": "success",
+                        "type": "chatmode",
+                        "name": name,
+                        "filename": filename,
+                        "source_url": content_url,
+                        "message": f"Successfully installed chatmode '{name}' as {filename}",
+                    }
+                else:
+                    raise FileOperationError(
+                        f"Failed to create chatmode file: {filename}"
+                    )
 
             elif item_type == "instruction":
                 # Parse the content to extract frontmatter and content
@@ -306,55 +293,39 @@ class LibraryManager:
 
                 from .simple_file_ops import parse_frontmatter_file
 
-                # Write to temp file to parse
-                with tempfile.NamedTemporaryFile(
-                    mode="w",
-                    suffix=INSTRUCTION_FILE_EXTENSION,
-                    delete=False,
-                    encoding="utf-8",
-                ) as tmp:
-                    tmp.write(file_content)
-                    tmp_path = tmp.name
+                frontmatter, content_text = parse_frontmatter(file_content)
 
-                try:
-                    frontmatter, content_text = parse_frontmatter_file(tmp_path)
+                # Create the instruction
+                success = self.instruction_manager.create_instruction(
+                    filename,
+                    frontmatter.get("description", item_data.get("description", "")),
+                    content_text,
+                )
 
-                    # Create the instruction
-                    success = self.instruction_manager.create_instruction(
+                if success:
+                    # Add source_url to track origin
+                    updated_frontmatter = frontmatter.copy()
+                    updated_frontmatter["source_url"] = content_url
+                    updated_frontmatter["library_source"] = name
+
+                    self.instruction_manager.update_instruction(
                         filename,
-                        frontmatter.get(
-                            "description", item_data.get("description", "")
-                        ),
-                        content_text,
+                        frontmatter=updated_frontmatter,
+                        content=content_text,
                     )
 
-                    if success:
-                        # Add source_url to track origin
-                        updated_frontmatter = frontmatter.copy()
-                        updated_frontmatter["source_url"] = content_url
-                        updated_frontmatter["library_source"] = name
-
-                        self.instruction_manager.update_instruction(
-                            filename,
-                            frontmatter=updated_frontmatter,
-                            content=content_text,
-                        )
-
-                        return {
-                            "status": "success",
-                            "type": "instruction",
-                            "name": name,
-                            "filename": filename,
-                            "source_url": content_url,
-                            "message": f"Successfully installed instruction '{name}' as {filename}",
-                        }
-                    else:
-                        raise FileOperationError(
-                            f"Failed to create instruction file: {filename}"
-                        )
-
-                finally:
-                    Path(tmp_path).unlink(missing_ok=True)
+                    return {
+                        "status": "success",
+                        "type": "instruction",
+                        "name": name,
+                        "filename": filename,
+                        "source_url": content_url,
+                        "message": f"Successfully installed instruction '{name}' as {filename}",
+                    }
+                else:
+                    raise FileOperationError(
+                        f"Failed to create instruction file: {filename}"
+                    )
 
             else:
                 raise FileOperationError(f"Unknown item type: {item_type}")

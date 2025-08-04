@@ -233,7 +233,7 @@ class InstructionManager:
             )
 
         # Create frontmatter with applyTo field so instructions are actually applied
-        frontmatter: Dict[str, Any] = {"applyTo": "**", "description": description}
+        frontmatter: Dict[str, Any] = {"applyTo": "'**'", "description": description}
 
         try:
             success = write_frontmatter_file(
