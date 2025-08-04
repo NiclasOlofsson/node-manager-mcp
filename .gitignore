@@ -190,6 +190,9 @@ $RECYCLE.BIN/
 *.swp
 *.swo
 
+# Mode Manager MCP log file
+*.log
+
 # Test files and outputs
 test_output/
 *.test

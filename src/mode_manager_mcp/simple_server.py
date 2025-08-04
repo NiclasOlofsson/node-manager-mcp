@@ -21,9 +21,20 @@ from .instruction_manager import INSTRUCTION_FILE_EXTENSION, InstructionManager
 from .library_manager import LibraryManager
 from .simple_file_ops import FileOperationError
 
-# Set up logging
-logging.basicConfig(level=logging.INFO)
+# Set up logging to both stderr and a log file
+log_formatter = logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s")
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+# StreamHandler for stderr
+stream_handler = logging.StreamHandler()
+stream_handler.setFormatter(log_formatter)
+logger.addHandler(stream_handler)
+
+# FileHandler for mode_manager.log
+file_handler = logging.FileHandler("mode_manager.log", encoding="utf-8")
+file_handler.setFormatter(log_formatter)
+logger.addHandler(file_handler)
 
 
 class ModeManagerServer:
@@ -47,6 +58,8 @@ class ModeManagerServer:
             name="Mode Manager MCP",
             instructions="""
             Persistent Copilot Memory for VS Code (2025+).
+
+            GitHub Repository: https://github.com/NiclasOlofsson/mode-manager-mcp
 
             Game-Changer for 2025:
             - Copilot now loads instructions with every chat message, not just at session start.
@@ -497,6 +510,10 @@ description: Personal AI memory for conversations and preferences
             except Exception as e:
                 return f"Error listing VS Code instructions: {str(e)}"
 
+        from typing import Annotated
+
+        from pydantic import Field
+
         @self.app.tool(
             name="get_instruction",
             description="Get the raw content of a VS Code .instructions.md file.",
@@ -505,21 +522,32 @@ description: Personal AI memory for conversations and preferences
                 "idempotentHint": True,
                 "readOnlyHint": True,
                 "title": "Get Instruction",
+                "parameters": {
+                    "instruction_name": "The name of the instruction (without extension). If a full filename is provided, it will be used as-is. Otherwise, .instructions.md will be appended automatically. This tool is flexible: you can provide just the name (e.g. <instruction_name>) or the full filename (e.g. <instruction_name>.instructions.md). If the extension is missing, it will be added automatically."
+                },
+                "returns": "Returns the raw markdown content of the specified instruction file, or an error message if not found. Display recommendation: If the file is longer than 40 lines, show the first 10 lines, then '........', then the last 10 lines.",
             },
             meta={
                 "category": "instruction",
                 "version": "1.0",
             },
         )
-        def get_instruction(filename: str) -> str:
+        def get_instruction(
+            instruction_name: Annotated[
+                str, Field(description="Name of the instruction (without extension)")
+            ],
+        ) -> str:
+            """Get the raw content of a VS Code .instructions.md file."""
             try:
                 # Ensure correct extension
-                if not filename.endswith(INSTRUCTION_FILE_EXTENSION):
-                    filename += INSTRUCTION_FILE_EXTENSION
-                raw_content = instruction_manager.get_raw_instruction(filename)
+                if not instruction_name.endswith(INSTRUCTION_FILE_EXTENSION):
+                    instruction_name += INSTRUCTION_FILE_EXTENSION
+                raw_content = instruction_manager.get_raw_instruction(instruction_name)
                 return raw_content
             except Exception as e:
-                return f"Error getting VS Code instruction '{filename}': {str(e)}"
+                return (
+                    f"Error getting VS Code instruction '{instruction_name}': {str(e)}"
+                )
 
         class RememberOutput(BaseModel):
             status: str
