@@ -27,20 +27,14 @@ async def test_create_chatmode_endpoint(server: ModeManagerServer) -> None:
                 "tools": "tool1,tool2",
             },
         )
-        assert "Successfully created" in result.data or "Successfully created" in str(
-            result
-        )
+        assert "Successfully created" in result.data or "Successfully created" in str(result)
 
 
 @pytest.mark.asyncio
 async def test_delete_chatmode_endpoint(server: ModeManagerServer) -> None:
     async with Client(server.app) as client:
-        result = await client.call_tool(
-            "delete_chatmode", {"filename": "func_test.chatmode.md"}
-        )
-        assert "Successfully deleted" in result.data or "Successfully deleted" in str(
-            result
-        )
+        result = await client.call_tool("delete_chatmode", {"filename": "func_test.chatmode.md"})
+        assert "Successfully deleted" in result.data or "Successfully deleted" in str(result)
 
 
 @pytest.mark.asyncio
@@ -54,17 +48,11 @@ async def test_create_instruction_endpoint(server: ModeManagerServer) -> None:
                 "content": "content",
             },
         )
-        assert "Successfully created" in result.data or "Successfully created" in str(
-            result
-        )
+        assert "Successfully created" in result.data or "Successfully created" in str(result)
 
 
 @pytest.mark.asyncio
 async def test_delete_instruction_endpoint(server: ModeManagerServer) -> None:
     async with Client(server.app) as client:
-        result = await client.call_tool(
-            "delete_instruction", {"instruction_name": "func_test.instructions.md"}
-        )
-        assert "Successfully deleted" in result.data or "Successfully deleted" in str(
-            result
-        )
+        result = await client.call_tool("delete_instruction", {"instruction_name": "func_test.instructions.md"})
+        assert "Successfully deleted" in result.data or "Successfully deleted" in str(result)

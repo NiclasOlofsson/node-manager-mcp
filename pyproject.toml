@@ -47,6 +47,7 @@ dev = [
     "pre-commit>=3.0.0",
     "types-psutil",
     "types-requests",
+    "pydocstringformatter>=0.4.0",
 ]
 
 [project.urls]
@@ -76,16 +77,17 @@ dependencies = [
     "mypy",
     "pre-commit",
     "types-psutil",
+    "pydocstringformatter",
 ]
 [tool.hatch.envs.default.scripts]
 test = "pytest"
 lint = "black --check src tests"
 typecheck = "mypy src tests"
-format = "black src tests"
+format = "pydocstringformatter src tests && black src tests"
 precommit = "pre-commit run --all-files"
 
 [tool.black]
-line-length = 88
+line-length = 250
 target-version = ['py38']
 
 [tool.mypy]
@@ -112,3 +114,8 @@ python_functions = ["test_*"]
 
 [tool.hatch.version]
 path = "src/mode_manager_mcp/__init__.py"
+
+[tool.pydocstringformatter]
+write = true
+style = "pep257"
+strip-whitespaces = true

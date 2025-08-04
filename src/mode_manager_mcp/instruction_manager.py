@@ -62,9 +62,7 @@ class InstructionManager:
             logger.info(f"Appended entry to end of: {instruction_name}")
             return True
         except Exception as e:
-            raise FileOperationError(
-                f"Error appending entry to {instruction_name}: {e}"
-            )
+            raise FileOperationError(f"Error appending entry to {instruction_name}: {e}")
 
     """
     Manages VS Code .instructions.md files in the prompts directory.
@@ -85,9 +83,7 @@ class InstructionManager:
         # Ensure prompts directory exists
         self.prompts_dir.mkdir(parents=True, exist_ok=True)
 
-        logger.info(
-            f"Instruction manager initialized with prompts directory: {self.prompts_dir}"
-        )
+        logger.info(f"Instruction manager initialized with prompts directory: {self.prompts_dir}")
 
     def list_instructions(self) -> List[Dict[str, Any]]:
         """
@@ -167,9 +163,7 @@ class InstructionManager:
             }
 
         except Exception as e:
-            raise FileOperationError(
-                f"Error reading instruction file {instruction_name}: {e}"
-            )
+            raise FileOperationError(f"Error reading instruction file {instruction_name}: {e}")
 
     def get_raw_instruction(self, instruction_name: str) -> str:
         """
@@ -199,13 +193,9 @@ class InstructionManager:
                 return f.read()
 
         except Exception as e:
-            raise FileOperationError(
-                f"Error reading raw instruction file {instruction_name}: {e}"
-            )
+            raise FileOperationError(f"Error reading raw instruction file {instruction_name}: {e}")
 
-    def create_instruction(
-        self, instruction_name: str, description: str, content: str
-    ) -> bool:
+    def create_instruction(self, instruction_name: str, description: str, content: str) -> bool:
         """
         Create a new instruction file.
 
@@ -228,25 +218,19 @@ class InstructionManager:
         file_path = self.prompts_dir / instruction_name
 
         if file_path.exists():
-            raise FileOperationError(
-                f"Instruction file already exists: {instruction_name}"
-            )
+            raise FileOperationError(f"Instruction file already exists: {instruction_name}")
 
         # Create frontmatter with applyTo field so instructions are actually applied
         frontmatter: Dict[str, Any] = {"applyTo": "'**'", "description": description}
 
         try:
-            success = write_frontmatter_file(
-                file_path, frontmatter, content, create_backup=False
-            )
+            success = write_frontmatter_file(file_path, frontmatter, content, create_backup=False)
             if success:
                 logger.info(f"Created instruction file: {instruction_name}")
             return success
 
         except Exception as e:
-            raise FileOperationError(
-                f"Error creating instruction file {instruction_name}: {e}"
-            )
+            raise FileOperationError(f"Error creating instruction file {instruction_name}: {e}")
 
     def update_instruction(
         self,
@@ -288,26 +272,20 @@ class InstructionManager:
                 frontmatter, content = parse_frontmatter(content)
 
             # Use provided values or keep current ones
-            new_frontmatter = (
-                frontmatter if frontmatter is not None else current_frontmatter
-            )
+            new_frontmatter = frontmatter if frontmatter is not None else current_frontmatter
             # If new content is provided, replace all markdown content
             if content is not None:
                 new_content = content
             else:
                 new_content = current_content
 
-            success = write_frontmatter_file(
-                file_path, new_frontmatter, new_content, create_backup=True
-            )
+            success = write_frontmatter_file(file_path, new_frontmatter, new_content, create_backup=True)
             if success:
                 logger.info(f"Updated instruction file with backup: {instruction_name}")
             return success
 
         except Exception as e:
-            raise FileOperationError(
-                f"Error updating instruction file {instruction_name}: {e}"
-            )
+            raise FileOperationError(f"Error updating instruction file {instruction_name}: {e}")
 
     def delete_instruction(self, instruction_name: str) -> bool:
         """
@@ -339,6 +317,4 @@ class InstructionManager:
             return True
 
         except Exception as e:
-            raise FileOperationError(
-                f"Error deleting instruction file {instruction_name}: {e}"
-            )
+            raise FileOperationError(f"Error deleting instruction file {instruction_name}: {e}")

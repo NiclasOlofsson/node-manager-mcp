@@ -52,18 +52,12 @@ def get_vscode_user_directory() -> Path:
             insiders_dir = Path(appdata) / "Code - Insiders" / "User"
             stable_dir = Path(appdata) / "Code" / "User"
         else:
-            localappdata = os.environ.get(
-                "LOCALAPPDATA", os.path.expanduser("~\\AppData\\Local")
-            )
-            insiders_dir = (
-                Path(localappdata) / "Programs" / "Microsoft VS Code Insiders" / "User"
-            )
+            localappdata = os.environ.get("LOCALAPPDATA", os.path.expanduser("~\\AppData\\Local"))
+            insiders_dir = Path(localappdata) / "Programs" / "Microsoft VS Code Insiders" / "User"
             stable_dir = Path(localappdata) / "Programs" / "Microsoft VS Code" / "User"
 
     elif system == "Darwin":
-        insiders_dir = (
-            Path.home() / "Library" / "Application Support" / "Code - Insiders" / "User"
-        )
+        insiders_dir = Path.home() / "Library" / "Application Support" / "Code - Insiders" / "User"
         stable_dir = Path.home() / "Library" / "Application Support" / "Code" / "User"
 
     else:
@@ -114,26 +108,15 @@ def find_vscode_executable() -> Optional[Path]:
     if system == "Windows":
         # Common Windows installation paths
         possible_paths = [
-            Path(os.environ.get("PROGRAMFILES", "C:\\Program Files"))
-            / "Microsoft VS Code"
-            / "Code.exe",
-            Path(os.environ.get("PROGRAMFILES(X86)", "C:\\Program Files (x86)"))
-            / "Microsoft VS Code"
-            / "Code.exe",
-            Path(
-                os.environ.get("LOCALAPPDATA", os.path.expanduser("~\\AppData\\Local"))
-            )
-            / "Programs"
-            / "Microsoft VS Code"
-            / "Code.exe",
+            Path(os.environ.get("PROGRAMFILES", "C:\\Program Files")) / "Microsoft VS Code" / "Code.exe",
+            Path(os.environ.get("PROGRAMFILES(X86)", "C:\\Program Files (x86)")) / "Microsoft VS Code" / "Code.exe",
+            Path(os.environ.get("LOCALAPPDATA", os.path.expanduser("~\\AppData\\Local"))) / "Programs" / "Microsoft VS Code" / "Code.exe",
         ]
 
     elif system == "Darwin":
         # macOS paths
         possible_paths = [
-            Path(
-                "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"
-            ),
+            Path("/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"),
             Path("/usr/local/bin/code"),
         ]
 

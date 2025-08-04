@@ -80,9 +80,7 @@ def parse_frontmatter(content: str) -> Tuple[Dict[str, Any], str]:
                     except json.JSONDecodeError:
                         # Simple list parsing
                         items = value[1:-1].split(",")
-                        frontmatter[key] = [
-                            item.strip().strip("\"'") for item in items if item.strip()
-                        ]
+                        frontmatter[key] = [item.strip().strip("\"'") for item in items if item.strip()]
                 elif value.startswith('"') and value.endswith('"'):
                     # Quoted string
                     frontmatter[key] = value[1:-1]
@@ -134,10 +132,7 @@ def write_frontmatter_file(
             import datetime
 
             timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            backup_path = (
-                file_path.parent
-                / f"{file_path.stem}.backup_{timestamp}{file_path.suffix}"
-            )
+            backup_path = file_path.parent / f"{file_path.stem}.backup_{timestamp}{file_path.suffix}"
 
             shutil.copy2(file_path, backup_path)
             logger.info(f"Created backup before write: {backup_path}")
@@ -179,9 +174,7 @@ def write_frontmatter_file(
         raise FileOperationError(f"Could not write file {file_path}: {e}")
 
 
-def write_file_with_backup(
-    file_path: Union[str, Path], content: str, create_backup: bool = True
-) -> bool:
+def write_file_with_backup(file_path: Union[str, Path], content: str, create_backup: bool = True) -> bool:
     """
     Write a file with optional backup.
 
@@ -203,10 +196,7 @@ def write_file_with_backup(
             import datetime
 
             timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            backup_path = (
-                file_path.parent
-                / f"{file_path.stem}.backup_{timestamp}{file_path.suffix}"
-            )
+            backup_path = file_path.parent / f"{file_path.stem}.backup_{timestamp}{file_path.suffix}"
 
             shutil.copy2(file_path, backup_path)
             logger.info(f"Created backup before write: {backup_path}")
@@ -251,10 +241,7 @@ def safe_delete_file(file_path: Union[str, Path], create_backup: bool = True) ->
             import datetime
 
             timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            backup_path = (
-                file_path.parent
-                / f"{file_path.stem}.backup_{timestamp}{file_path.suffix}"
-            )
+            backup_path = file_path.parent / f"{file_path.stem}.backup_{timestamp}{file_path.suffix}"
 
             shutil.copy2(file_path, backup_path)
             logger.info(f"Created backup: {backup_path}")
@@ -362,9 +349,7 @@ def read_text_file(file_path: Union[str, Path]) -> str:
             except UnicodeDecodeError:
                 continue
 
-        raise FileOperationError(
-            f"Could not decode file with any supported encoding: {file_path}"
-        )
+        raise FileOperationError(f"Could not decode file with any supported encoding: {file_path}")
 
     except Exception as e:
         raise FileOperationError(f"Could not read file {file_path}: {e}")

@@ -13,9 +13,7 @@ def server(global_patch_and_tempdir: str) -> ModeManagerServer:
 @pytest.mark.asyncio
 async def test_remember_integration(server: ModeManagerServer) -> None:
     async with Client(server.app) as client:
-        result = await client.call_tool(
-            "remember", {"memory_item": "integration test memory"}
-        )
+        result = await client.call_tool("remember", {"memory_item": "integration test memory"})
         assert "Remembered" in result.data or "Remembered" in str(result)
 
 

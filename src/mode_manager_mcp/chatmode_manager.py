@@ -24,9 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 class ChatModeManager:
-    """
-    Manages VS Code .chatmode.md files in the prompts directory.
-    """
+    """Manages VS Code .chatmode.md files in the prompts directory."""
 
     def __init__(self, prompts_dir: Optional[Union[str, Path]] = None):
         """
@@ -43,9 +41,7 @@ class ChatModeManager:
         # Ensure prompts directory exists
         self.prompts_dir.mkdir(parents=True, exist_ok=True)
 
-        logger.info(
-            f"ChatMode manager initialized with prompts directory: {self.prompts_dir}"
-        )
+        logger.info(f"ChatMode manager initialized with prompts directory: {self.prompts_dir}")
 
     def list_chatmodes(self) -> List[Dict[str, Any]]:
         """
@@ -195,9 +191,7 @@ class ChatModeManager:
             frontmatter["tools"] = tools
 
         try:
-            success = write_frontmatter_file(
-                file_path, frontmatter, content, create_backup=False
-            )
+            success = write_frontmatter_file(file_path, frontmatter, content, create_backup=False)
             if success:
                 logger.info(f"Created chatmode file: {filename}")
             return success
@@ -239,14 +233,10 @@ class ChatModeManager:
             current_frontmatter, current_content = parse_frontmatter_file(file_path)
 
             # Use provided values or keep current ones
-            new_frontmatter = (
-                frontmatter if frontmatter is not None else current_frontmatter
-            )
+            new_frontmatter = frontmatter if frontmatter is not None else current_frontmatter
             new_content = content if content is not None else current_content
 
-            success = write_frontmatter_file(
-                file_path, new_frontmatter, new_content, create_backup=True
-            )
+            success = write_frontmatter_file(file_path, new_frontmatter, new_content, create_backup=True)
             if success:
                 logger.info(f"Updated chatmode file with backup: {filename}")
             return success
@@ -330,9 +320,7 @@ class ChatModeManager:
                         source_content = raw_content.decode("utf-8")
                     except UnicodeDecodeError:
                         try:
-                            source_content = raw_content.decode(
-                                "cp1252"
-                            )  # Windows encoding
+                            source_content = raw_content.decode("cp1252")  # Windows encoding
                         except UnicodeDecodeError:
                             source_content = raw_content.decode("latin1")  # Fallback
             except urllib.error.URLError as e:
@@ -341,31 +329,22 @@ class ChatModeManager:
             # Parse source content
             try:
                 # For GitHub Gist raw URLs, the content is just the file content
-                if (
-                    "gist.github.com" in source_url
-                    or "gist.githubusercontent.com" in source_url
-                ):
+                if "gist.github.com" in source_url or "gist.githubusercontent.com" in source_url:
                     # Parse the source content as a frontmatter file
                     import tempfile
 
                     # Write to temp file to parse frontmatter
-                    with tempfile.NamedTemporaryFile(
-                        mode="w", suffix=".md", delete=False, encoding="utf-8"
-                    ) as temp_file:
+                    with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False, encoding="utf-8") as temp_file:
                         temp_file.write(source_content)
                         temp_path = Path(temp_file.name)
 
                     try:
-                        source_frontmatter, source_body = parse_frontmatter_file(
-                            temp_path
-                        )
+                        source_frontmatter, source_body = parse_frontmatter_file(temp_path)
                     finally:
                         temp_path.unlink()  # Clean up temp file
                 else:
                     # For other sources, assume it's already in the right format
-                    raise FileOperationError(
-                        f"Unsupported source URL format: {source_url}"
-                    )
+                    raise FileOperationError(f"Unsupported source URL format: {source_url}")
 
             except Exception as e:
                 raise FileOperationError(f"Failed to parse source content: {e}")
@@ -375,22 +354,16 @@ class ChatModeManager:
 
             # Create updated frontmatter by merging source with local customizations
             updated_frontmatter = source_frontmatter.copy()
-            updated_frontmatter["source_url"] = (
-                source_url  # Ensure source_url is preserved
-            )
+            updated_frontmatter["source_url"] = source_url  # Ensure source_url is preserved
 
             if local_tools:
                 updated_frontmatter["tools"] = local_tools
                 logger.info(f"Preserved local tools setting: {local_tools}")
 
             # Write updated file with backup
-            write_frontmatter_file(
-                file_path, updated_frontmatter, source_body, create_backup=True
-            )
+            write_frontmatter_file(file_path, updated_frontmatter, source_body, create_backup=True)
 
-            logger.info(
-                f"Successfully updated chatmode from source with backup: {filename}"
-            )
+            logger.info(f"Successfully updated chatmode from source with backup: {filename}")
 
             return {
                 "status": "success",
@@ -403,6 +376,4 @@ class ChatModeManager:
         except FileOperationError:
             raise
         except Exception as e:
-            raise FileOperationError(
-                f"Error updating chatmode from source {filename}: {e}"
-            )
+            raise FileOperationError(f"Error updating chatmode from source {filename}: {e}")

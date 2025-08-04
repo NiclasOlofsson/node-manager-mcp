@@ -21,13 +21,9 @@ logger = logging.getLogger(__name__)
 
 
 class LibraryManager:
-    """
-    Manages the Mode Manager MCP Library for browsing and installing modes/instructions.
-    """
+    """Manages the Mode Manager MCP Library for browsing and installing modes/instructions."""
 
-    def __init__(
-        self, library_url: Optional[str] = None, prompts_dir: Optional[str] = None
-    ):
+    def __init__(self, library_url: Optional[str] = None, prompts_dir: Optional[str] = None):
         """
         Initialize the library manager.
 
@@ -36,10 +32,7 @@ class LibraryManager:
             prompts_dir: Custom prompts directory for all managers (optional)
         """
         # Default to the official Mode Manager MCP library in the GitHub repository
-        self.library_url = (
-            library_url
-            or "https://raw.githubusercontent.com/NiclasOlofsson/node-manager-mcp/refs/heads/main/library/memory-mode-library.json"
-        )
+        self.library_url = library_url or "https://raw.githubusercontent.com/NiclasOlofsson/node-manager-mcp/refs/heads/main/library/memory-mode-library.json"
 
         self.chatmode_manager = ChatModeManager(prompts_dir=prompts_dir)
         self.instruction_manager = InstructionManager(prompts_dir=prompts_dir)
@@ -60,9 +53,7 @@ class LibraryManager:
             logger.info(f"Fetching library from: {self.library_url}")
 
             # Create request with user agent
-            req = urllib.request.Request(
-                self.library_url, headers={"User-Agent": "Mode-Manager-MCP/1.0"}
-            )
+            req = urllib.request.Request(self.library_url, headers={"User-Agent": "Mode-Manager-MCP/1.0"})
 
             # Fetch the JSON data
             with urllib.request.urlopen(req, timeout=30) as response:
@@ -76,30 +67,22 @@ class LibraryManager:
                 except UnicodeDecodeError:
                     continue
             else:
-                raise FileOperationError(
-                    "Could not decode library content with any supported encoding"
-                )
+                raise FileOperationError("Could not decode library content with any supported encoding")
 
             # Parse JSON
             library_data: Dict[str, Any] = json.loads(text_content)
 
-            logger.info(
-                f"Successfully loaded library: {library_data.get('name', 'Unknown')}"
-            )
+            logger.info(f"Successfully loaded library: {library_data.get('name', 'Unknown')}")
             return library_data
 
         except urllib.error.URLError as e:
-            raise FileOperationError(
-                f"Could not fetch library from {self.library_url}: {str(e)}"
-            )
+            raise FileOperationError(f"Could not fetch library from {self.library_url}: {str(e)}")
         except json.JSONDecodeError as e:
             raise FileOperationError(f"Invalid JSON in library: {str(e)}")
         except Exception as e:
             raise FileOperationError(f"Error fetching library: {str(e)}")
 
-    def browse_library(
-        self, category: Optional[str] = None, search: Optional[str] = None
-    ) -> Dict[str, Any]:
+    def browse_library(self, category: Optional[str] = None, search: Optional[str] = None) -> Dict[str, Any]:
         """
         Browse the available chatmodes and instructions in the library.
 
@@ -119,29 +102,15 @@ class LibraryManager:
                 chatmodes = [cm for cm in chatmodes if cm.get("category") == category]
             if search:
                 search_lower = search.lower()
-                chatmodes = [
-                    cm
-                    for cm in chatmodes
-                    if search_lower in cm.get("name", "").lower()
-                    or search_lower in cm.get("description", "").lower()
-                    or search_lower in " ".join(cm.get("tags", [])).lower()
-                ]
+                chatmodes = [cm for cm in chatmodes if search_lower in cm.get("name", "").lower() or search_lower in cm.get("description", "").lower() or search_lower in " ".join(cm.get("tags", [])).lower()]
 
             # Filter instructions
             instructions = library.get("instructions", [])
             if category:
-                instructions = [
-                    inst for inst in instructions if inst.get("category") == category
-                ]
+                instructions = [inst for inst in instructions if inst.get("category") == category]
             if search:
                 search_lower = search.lower()
-                instructions = [
-                    inst
-                    for inst in instructions
-                    if search_lower in inst.get("name", "").lower()
-                    or search_lower in inst.get("description", "").lower()
-                    or search_lower in " ".join(inst.get("tags", [])).lower()
-                ]
+                instructions = [inst for inst in instructions if search_lower in inst.get("name", "").lower() or search_lower in inst.get("description", "").lower() or search_lower in " ".join(inst.get("tags", [])).lower()]
 
             return {
                 "library_name": library.get("name", "Mode Manager MCP Library"),
@@ -188,9 +157,7 @@ class LibraryManager:
         except Exception as e:
             raise FileOperationError(f"Error getting library item '{name}': {str(e)}")
 
-    def install_from_library(
-        self, name: str, custom_filename: Optional[str] = None
-    ) -> Dict[str, Any]:
+    def install_from_library(self, name: str, custom_filename: Optional[str] = None) -> Dict[str, Any]:
         """
         Install a chatmode or instruction from the library.
 
@@ -215,18 +182,12 @@ class LibraryManager:
                 raise FileOperationError(f"No content location found for '{name}'")
 
             # Determine filename
-            filename = (
-                custom_filename
-                or item_data.get("install_name")
-                or f"{name}.{item_type}.md"
-            )
+            filename = custom_filename or item_data.get("install_name") or f"{name}.{item_type}.md"
 
             # Fetch the content from the URL
             logger.info(f"Fetching {item_type} content from: {content_url}")
 
-            req = urllib.request.Request(
-                content_url, headers={"User-Agent": "Mode-Manager-MCP/1.0"}
-            )
+            req = urllib.request.Request(content_url, headers={"User-Agent": "Mode-Manager-MCP/1.0"})
 
             with urllib.request.urlopen(req, timeout=30) as response:
                 content = response.read()
@@ -239,9 +200,7 @@ class LibraryManager:
                 except UnicodeDecodeError:
                     continue
             else:
-                raise FileOperationError(
-                    "Could not decode file content with any supported encoding"
-                )
+                raise FileOperationError("Could not decode file content with any supported encoding")
 
             # Install based on type
             if item_type == "chatmode":
@@ -282,9 +241,7 @@ class LibraryManager:
                         "message": f"Successfully installed chatmode '{name}' as {filename}",
                     }
                 else:
-                    raise FileOperationError(
-                        f"Failed to create chatmode file: {filename}"
-                    )
+                    raise FileOperationError(f"Failed to create chatmode file: {filename}")
 
             elif item_type == "instruction":
                 # Parse the content to extract frontmatter and content
@@ -323,21 +280,15 @@ class LibraryManager:
                         "message": f"Successfully installed instruction '{name}' as {filename}",
                     }
                 else:
-                    raise FileOperationError(
-                        f"Failed to create instruction file: {filename}"
-                    )
+                    raise FileOperationError(f"Failed to create instruction file: {filename}")
 
             else:
                 raise FileOperationError(f"Unknown item type: {item_type}")
 
         except urllib.error.URLError as e:
-            raise FileOperationError(
-                f"Could not fetch content from {content_url}: {str(e)}"
-            )
+            raise FileOperationError(f"Could not fetch content from {content_url}: {str(e)}")
         except Exception as e:
-            raise FileOperationError(
-                f"Error installing '{name}' from library: {str(e)}"
-            )
+            raise FileOperationError(f"Error installing '{name}' from library: {str(e)}")
 
     def refresh_library(self) -> Dict[str, Any]:
         """
