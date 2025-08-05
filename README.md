@@ -19,12 +19,15 @@ Perfect timing for 2025: VS Code now loads instructions with every message. This
 
 ## Why This Matters Now
 
-**2025 Game Changer**: VS Code's new behavior loads custom instructions with **every chat request** (not just session start). This means:
+**2025 Game Changer**: This tool is built specifically for VS Code's new behavior where **custom instructions load with every chat message**. This makes persistent memory incredibly powerful - your memories are always active, no matter what topic you're discussing.
 
-- **Your memories are ALWAYS active** in every conversation  
+- **Your memories are ALWAYS active** in every conversation, every turn  
 - **No more repeating context** when you start new chats
 - **Copilot truly knows you** across sessions, topics, and projects
 - **Perfect timing** - built for the new instruction loading behavior
+
+**Ready to have Copilot that actually remembers you? [Get started now!](#get-it-running-2-minutes)**
+
 
 ## See It In Action
 
@@ -81,7 +84,9 @@ pip install pipx
 [![Install in VS Code Insiders](https://img.shields.io/badge/VS_Code_Insiders-Install_Server-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=modemanager&config=%7B%22command%22%3A%22pipx%22%2C%22args%22%3A%5B%22run%22%2C%22mode-manager-mcp%22%5D%7D&quality=insiders)
 
 ### .. Or manually add it to your VS Code
+
 Add this to your VS Code MCP settings (`mcp.json`):
+
 ```json
 {
   "servers": {
@@ -94,7 +99,6 @@ Add this to your VS Code MCP settings (`mcp.json`):
     }
   }
 }
-
 ```
 
 That's it! Start chatting with Copilot and use: *"Remember that..."*
@@ -108,6 +112,10 @@ As a convenience, you can run the following prompt in VS Code to get started in 
 ```
 
 This will guide you through the onboarding process, set up your persistent memory, and ensure Copilot knows your preferences from the start.
+
+### For the impatient (and brave) that can't wait for next release ..
+
+If you add this in to your `mcp.json` it will result in `pipx` download and install the latest directly from github, every time. Always bleeding edge .. 
 
 ```json
 {
@@ -126,14 +134,6 @@ This will guide you through the onboarding process, set up your persistent memor
   }
 }
 ```
-
-## Perfect Timing for 2025
-
-This tool is built specifically for VS Code's new behavior where **custom instructions load with every chat message**. This makes persistent memory incredibly powerful - your memories are always active, no matter what topic you're discussing.
-
----
-
-**Ready to have Copilot that actually remembers you? [Get started now!](#get-it-running-2-minutes)**
 
 ## Contributing
 
