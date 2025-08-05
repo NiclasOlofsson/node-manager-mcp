@@ -16,18 +16,23 @@ import psutil
 
 
 def detect_vscode_variant() -> Optional[str]:
-    # psutil is always present
+    # Walk up the process tree to find VS Code (Stable or Insiders)
     try:
-        parent = psutil.Process(os.getppid())
-        proc_name = parent.name().lower()
-    except Exception as e:
-        logger.error(f"Error detecting VS Code variant: {e}")
+        proc: Optional[psutil.Process] = psutil.Process(os.getpid())
+        while proc:
+            proc_name = proc.name().lower()
+            proc_exe = proc.exe().lower() if proc.exe() else ""
+            if "insiders" in proc_name or "insiders" in proc_exe:
+                return "insiders"
+            elif "code" in proc_name or "code" in proc_exe:
+                return "stable"
+            if proc.ppid() == 0 or proc.pid == proc.ppid():
+                break
+            proc = proc.parent()
         return None
-    if "insiders" in proc_name:
-        return "insiders"
-    elif "code" in proc_name:
-        return "stable"
-    return None
+    except Exception as e:
+        logger.error(f"Error walking process tree for VS Code variant: {e}")
+        return None
 
 
 logger = logging.getLogger(__name__)
