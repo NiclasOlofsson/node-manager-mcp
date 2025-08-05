@@ -109,6 +109,24 @@ As a convenience, you can run the following prompt in VS Code to get started in 
 
 This will guide you through the onboarding process, set up your persistent memory, and ensure Copilot knows your preferences from the start.
 
+```json
+{
+  "servers": {
+    "mode-manager": {
+      "command": "pipx",
+      "args": [
+        "run",
+        "--no-cache",
+        "--system-site-packages",
+        "--spec",
+        "git+https://github.com/NiclasOlofsson/mode-manager-mcp.git",
+        "mode-manager-mcp"
+      ]
+    }
+  }
+}
+```
+
 ## Perfect Timing for 2025
 
 This tool is built specifically for VS Code's new behavior where **custom instructions load with every chat message**. This makes persistent memory incredibly powerful - your memories are always active, no matter what topic you're discussing.
