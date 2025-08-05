@@ -16,10 +16,20 @@ from .simple_server import create_server
 def setup_logging(debug: bool = False) -> None:
     """Set up logging configuration."""
     level = logging.DEBUG if debug else logging.INFO
+    handlers: list[logging.Handler] = [logging.StreamHandler(sys.stderr)]
+    try:
+        file_handler = logging.FileHandler("mode_manager.log", encoding="utf-8")
+        file_handler.setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
+        handlers.append(file_handler)
+    except Exception:
+        pass  # If file can't be opened, just use stderr
+
+    handlers[0].setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
+
     logging.basicConfig(
         level=level,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        handlers=[logging.StreamHandler(sys.stderr)],
+        handlers=handlers,
     )
 
 

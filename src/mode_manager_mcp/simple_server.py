@@ -25,20 +25,7 @@ from .instruction_manager import INSTRUCTION_FILE_EXTENSION, InstructionManager
 from .library_manager import LibraryManager
 from .simple_file_ops import FileOperationError
 
-# Set up logging to both stderr and a log file
-log_formatter = logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s")
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-# StreamHandler for stderr
-stream_handler = logging.StreamHandler()
-stream_handler.setFormatter(log_formatter)
-logger.addHandler(stream_handler)
-
-# FileHandler for mode_manager.log
-file_handler = logging.FileHandler("mode_manager.log", encoding="utf-8")
-file_handler.setFormatter(log_formatter)
-logger.addHandler(file_handler)
 
 
 class ModeManagerServer:
