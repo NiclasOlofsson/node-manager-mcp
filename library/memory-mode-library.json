@@ -294,7 +294,7 @@
   },
   "repository_info": {
     "owner": "NiclasOlofsson",
-    "repo": "node-manager-mcp",
-    "library_url": "https://raw.githubusercontent.com/NiclasOlofsson/node-manager-mcp/main/library/memory-mode-library.json"
+    "repo": "mode-manager-mcp",
+    "library_url": "https://raw.githubusercontent.com/NiclasOlofsson/mode-manager-mcp/main/library/memory-mode-library.json"
   }
 }

@@ -11,8 +11,8 @@ Thank you for your interest in contributing to the Mode Manager MCP Server!
 
 2. **Clone the repository:**
    ```bash
-   git clone https://github.com/NiclasOlofsson/node-manager-mcp.git
-   cd node-manager-mcp
+   git clone https://github.com/NiclasOlofsson/mode-manager-mcp.git
+   cd mode-manager-mcp
    ```
 
 3. **Run tests:**

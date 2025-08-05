@@ -51,10 +51,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/NiclasOlofsson/node-manager-mcp"
-Repository = "https://github.com/NiclasOlofsson/node-manager-mcp"
-Issues = "https://github.com/NiclasOlofsson/node-manager-mcp/issues"
-Documentation = "https://github.com/NiclasOlofsson/node-manager-mcp#readme"
+Homepage = "https://github.com/NiclasOlofsson/mode-manager-mcp"
+Repository = "https://github.com/NiclasOlofsson/mode-manager-mcp"
+Issues = "https://github.com/NiclasOlofsson/mode-manager-mcp/issues"
+Documentation = "https://github.com/NiclasOlofsson/mode-manager-mcp#readme"
 
 [project.scripts]
 mode-manager-mcp = "mode_manager_mcp.__main__:main"
