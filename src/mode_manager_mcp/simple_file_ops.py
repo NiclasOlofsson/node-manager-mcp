@@ -81,20 +81,22 @@ def parse_frontmatter(content: str) -> Tuple[Dict[str, Any], str]:
                         # Simple list parsing
                         items = value[1:-1].split(",")
                         frontmatter[key] = [item.strip().strip("\"'") for item in items if item.strip()]
-                elif value.startswith('"') and value.endswith('"'):
-                    # Quoted string
+                elif value.startswith('"') and value.endswith('"') and len(value) >= 2:
+                    # Double-quoted string - preserve the content but remove surrounding quotes
+                    # This indicates the user explicitly wanted it as a string literal
                     frontmatter[key] = value[1:-1]
-                elif value.startswith("'") and value.endswith("'"):
-                    # Quoted string
+                elif value.startswith("'") and value.endswith("'") and len(value) >= 2:
+                    # Single-quoted string - preserve the content but remove surrounding quotes
+                    # This indicates the user explicitly wanted it as a string literal
                     frontmatter[key] = value[1:-1]
                 elif value.lower() in ("true", "false"):
                     # Boolean
                     frontmatter[key] = value.lower() == "true"
-                elif value.isdigit():
-                    # Integer
+                elif value.isdigit() or (value.startswith("-") and value[1:].isdigit()):
+                    # Integer (including negative)
                     frontmatter[key] = int(value)
                 else:
-                    # String
+                    # Unquoted string
                     frontmatter[key] = value
 
         return frontmatter, body_content
@@ -145,8 +147,18 @@ def write_frontmatter_file(
                 # Format list as JSON array for simplicity
                 frontmatter_lines.append(f"{key}: {json.dumps(value)}")
             elif isinstance(value, str):
-                # Quote strings that contain special characters
-                if ":" in value or "\n" in value or value.startswith(('"', "'")):
+                # Quote strings that contain special characters or YAML special sequences
+                needs_quoting = (
+                    ":" in value
+                    or "\n" in value
+                    or value.startswith(('"', "'"))
+                    or value in ("**", "*", "?", "|", ">", "@", "`")  # YAML special chars
+                    or value.startswith(("*", "?", "[", "{", "!", "&", "|", ">", "@", "`"))
+                    or value.endswith(("*", "?"))
+                    or value.strip() != value  # Has leading/trailing whitespace
+                )
+
+                if needs_quoting:
                     frontmatter_lines.append(f'{key}: "{value}"')
                 else:
                     frontmatter_lines.append(f"{key}: {value}")
