@@ -42,11 +42,13 @@ class ModeManagerServer:
             library_url: Custom URL for the Mode Manager MCP Library (optional)
             prompts_dir: Custom prompts directory for all managers (optional)
         """
-        # FastMCP 2.11.0 initialization with recommended arguments
+        # FastMCP initialization with recommended arguments
+        from . import __version__
+
         self.app = FastMCP(
+            version=__version__,
             name="Mode Manager MCP",
-            instructions="""
-            Persistent Copilot Memory for VS Code (2025+).
+            instructions="""Persistent Copilot Memory for VS Code (2025+).
 
             GitHub Repository: https://github.com/NiclasOlofsson/mode-manager-mcp
 
@@ -723,17 +725,16 @@ class ModeManagerServer:
             },
             meta={"category": "memory", "version": "1.0", "author": "Oatly Data Team"},
         )
-        async def remember(
-            memory_item: Annotated[Optional[str], Field(description="The information to remember")] = None,
-        ) -> str:
+        async def remember(ctx: Context, memory_item: Annotated[str, Field(description="The information to remember")]) -> str:
             """Store a memory item in your personal AI memory for future conversations."""
             if read_only:
                 return "Error: Server is running in read-only mode"
-            if memory_item is None:
+            if memory_item is None or memory_item.strip() == "":
                 return "Error: No memory item provided."
             try:
                 memory_filename = f"memory{INSTRUCTION_FILE_EXTENSION}"
                 memory_path = instruction_manager.prompts_dir / memory_filename
+
                 if not memory_path.exists():
                     initial_content = "# Personal AI Memory\nThis file contains information that I should remember about you and your preferences for future conversations.\n## Memories\n"
                     success = instruction_manager.create_instruction(
@@ -744,14 +745,38 @@ class ModeManagerServer:
                     if not success:
                         return f"Error: Failed to create memory file at {memory_path}"
                     logger.info("Created new memory file for user")
+
                 timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
                 new_memory_entry = f"- {timestamp}: {memory_item}\n"
-                # Directly append to the file
-                try:
-                    with open(memory_path, "a", encoding="utf-8") as f:
-                        f.write(new_memory_entry)
-                except Exception as e:
-                    return f"Error: Failed to append memory: {str(e)}"
+
+                memory_content = instruction_manager.get_raw_instruction(memory_filename)
+                response = await ctx.sample(
+                    """Please analyze and optimize content below for LLM compliance and effectiveness.
+
+                    Remove redundancy, clarify ambiguous rules, and ensure all laws are explicit, numbered, and clearly labeled as “Law,” “Policy,” or “Suggestion/Hint.”
+                    Separate universal laws, project-specific exceptions, policies, preferences, suggestions/hints, and memories/facts.
+                    Ensure all rules are concise, actionable, and easy for an LLM to follow.
+                    Output the improved file in markdown, preserving front matter and section headers. 
+                    The output MUST include the following front matter at the top of the file:
+                    ---
+                    applyTo: '**'
+                    description: Personal AI memory for conversations and preferences
+                    ---
+                    This header must only appear once in the output.
+                    You must only return the content and no other text.
+                    This is the content I want you to analyze and optimize:
+                    """
+                    + memory_content
+                    + "\n"
+                    + new_memory_entry,
+                    temperature=0.2,  # Lower temperature for more repeatable outcomes
+                    max_tokens=1500,
+                    model_preferences="gtp-4.1",
+                )
+                logger.info(f"Proposed optimization for memory file\n{response}")
+
+                instruction_manager.update_instruction(memory_filename, content=response.text)
+
                 return f"Remembered: {memory_item}\nThis memory will be available to AI assistants when the memory instruction is active in VS Code."
             except Exception as e:
                 return f"Error: Exception occurred: {str(e)}"
