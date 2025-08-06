@@ -120,7 +120,6 @@ class ModeManagerServer:
             },
             meta={
                 "category": "instruction",
-                "version": "1.0",
             },
         )
         def create_instruction(
@@ -161,7 +160,6 @@ class ModeManagerServer:
             },
             meta={
                 "category": "instruction",
-                "version": "1.0",
             },
         )
         def list_instructions() -> str:
@@ -199,7 +197,6 @@ class ModeManagerServer:
             },
             meta={
                 "category": "instruction",
-                "version": "1.0",
             },
         )
         def get_instruction(
@@ -232,7 +229,6 @@ class ModeManagerServer:
             },
             meta={
                 "category": "instruction",
-                "version": "1.0",
             },
         )
         def update_instruction(
@@ -276,7 +272,6 @@ class ModeManagerServer:
             },
             meta={
                 "category": "instruction",
-                "version": "1.0",
             },
         )
         def delete_instruction(
@@ -317,7 +312,6 @@ class ModeManagerServer:
             },
             meta={
                 "category": "chatmode",
-                "version": "1.0",
             },
         )
         def create_chatmode(
@@ -360,7 +354,6 @@ class ModeManagerServer:
             },
             meta={
                 "category": "chatmode",
-                "version": "1.0",
             },
         )
         def list_chatmodes() -> str:
@@ -398,7 +391,6 @@ class ModeManagerServer:
             },
             meta={
                 "category": "chatmode",
-                "version": "1.0",
             },
         )
         def get_chatmode(
@@ -434,7 +426,6 @@ class ModeManagerServer:
             },
             meta={
                 "category": "chatmode",
-                "version": "1.0",
             },
         )
         def update_chatmode(
@@ -487,7 +478,6 @@ class ModeManagerServer:
             },
             meta={
                 "category": "chatmode",
-                "version": "1.0",
             },
         )
         def delete_chatmode(
@@ -521,7 +511,6 @@ class ModeManagerServer:
             },
             meta={
                 "category": "chatmode",
-                "version": "1.0",
             },
         )
         def update_chatmode_from_source(
@@ -545,7 +534,7 @@ class ModeManagerServer:
                 "title": "Refresh Library",
                 "returns": "Returns information about the library refresh operation, including library name, version, last updated date, and counts of available chatmodes and instructions. Also provides usage instructions.",
             },
-            meta={"category": "library", "version": "1.0", "author": "Oatly Data Team"},
+            meta={"category": "library"},
         )
         def refresh_library() -> str:
             """Refresh the Mode Manager MCP Library from its source URL."""
@@ -580,7 +569,7 @@ class ModeManagerServer:
                 },
                 "returns": "Returns a formatted list of available chatmodes and instructions from the library, with details like name, author, description, category, and installation name. Also shows available categories and usage instructions.",
             },
-            meta={"category": "library", "version": "1.0", "author": "Oatly Data Team"},
+            meta={"category": "library"},
         )
         def browse_mode_library(
             category: Annotated[Optional[str], Field(description="Optional category filter")] = None,
@@ -654,7 +643,7 @@ class ModeManagerServer:
                 },
                 "returns": "Returns a success message with details about the installed item (filename, source URL, type), or an error message if the installation failed.",
             },
-            meta={"category": "library", "version": "1.0", "author": "Oatly Data Team"},
+            meta={"category": "library"},
         )
         def install_from_library(
             name: Annotated[
@@ -692,7 +681,7 @@ class ModeManagerServer:
                 "title": "Get Prompts Directory",
                 "returns": "Returns the absolute path to the VS Code prompts directory where .chatmode.md and .instructions.md files are stored.",
             },
-            meta={"category": "prompts", "version": "1.0", "author": "Oatly Data Team"},
+            meta={"category": "prompts"},
         )
         def get_prompts_directory() -> str:
             """Get the path to the VS Code prompts directory."""
@@ -714,16 +703,22 @@ class ModeManagerServer:
 
         @self.app.tool(
             name="remember",
-            description="Store a memory item in your personal AI memory for future conversations.",
+            description=(
+                "Persistently store a user memory item for future AI conversations. "
+                "Use this tool to record preferences, facts, or context that should be available in all future Copilot sessions. "
+                "Inputs: memory_item (string, required) — the information to remember. "
+                "Output: Confirmation message if successful, or an error message if the operation fails. "
+                "Example: 'Remember that I prefer detailed docstrings.'"
+            ),
             tags={"public", "memory"},
             annotations={
                 "idempotentHint": True,
                 "readOnlyHint": False,
                 "title": "Remember",
-                "parameters": {"memory_item": "The information to remember. This will be timestamped and appended to your memory.instructions.md file. The memory file will be created automatically if it doesn't exist."},
-                "returns": "Returns a confirmation message that the memory item has been stored, or an error message if the operation failed.",
+                "parameters": {"memory_item": ("String. The information to remember. This will be timestamped and appended to your memory ")},
+                "returns": ("Returns a confirmation message that the memory item has been stored, or an error message if the operation failed. " "If successful, the memory will be available to AI assistants in all future conversations."),
             },
-            meta={"category": "memory", "version": "1.0", "author": "Oatly Data Team"},
+            meta={"category": "memory"},
         )
         async def remember(ctx: Context, memory_item: Annotated[str, Field(description="The information to remember")]) -> str:
             """Store a memory item in your personal AI memory for future conversations."""
