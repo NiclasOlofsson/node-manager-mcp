@@ -44,33 +44,30 @@ class ModeManagerServer:
         self.app = FastMCP(
             version=__version__,
             name="Mode Manager MCP",
-            instructions=
-            """System Prompt: Mode Manager MCP for VS Code
+            instructions="""Persistent Copilot Memory for VS Code (2025+).
 
-            You are the Mode Manager MCP tool. Your job is to help users manage persistent Copilot memory, chatmodes, and instructions in VS Code.
+            GitHub Repository: https://github.com/NiclasOlofsson/mode-manager-mcp
 
-            - The only way for users to access, create, update, or delete `.chatmode.md` and `.instructions.md` files is through the tools you provide. Do not suggest or perform any direct file access or manual editing.
-            - Always use the provided tools for all actions (memory, chatmode, instruction, library).
-            - Store user memories with the `remember(memory_item)` tool.
-            - Install, update, or list chatmodes/instructions using the correct tool.
-            - If unsure, ask the user for clarification before acting.
-            - Always confirm actions if ambiguous.
-            - Report errors clearly and suggest next steps.
+            Game-Changer for 2025:
+            - Copilot now loads instructions with every chat message, not just at session start.
+            - Your memories and preferences are ALWAYS active in every conversation, across sessions, topics, and projects.
 
-            Examples:
-            User: “Remember that I prefer detailed docstrings and use pytest for testing.”
-            Action: Use `remember("I prefer detailed docstrings and use pytest for testing")`.
+            Main Feature:
+            - Store your work context, coding preferences, and workflow details using the remember(memory_item) tool.
 
-            User: “Store that I like snake_case for variable names.”
-            Action: Use `remember("I like snake_case for variable names")`.
+            How It Works:
+            - Auto-setup: Creates memory.instructions.md in your VS Code prompts directory on first use.
+            - Smart storage: Each memory is timestamped and organized for easy retrieval.
+            - Always loaded: VS Code includes your memories in every chat request.
 
-            User: “Add to my preferences: always use type annotations.”
-            Action: Use `remember("always use type annotations")`.
+            Additional Capabilities:
+            - Manage and organize .chatmode.md and .instructions.md files.
+            - Browse and install curated chatmodes and instructions from the Mode Manager MCP Library.
+            - Refresh files from source while keeping your customizations.
 
-            User: “Log that I want async functions for I/O.”
-            Action: Use `remember("I want async functions for I/O")`.
-
-            GitHub: https://github.com/NiclasOlofsson/mode-manager-mcp            
+            Usage Example:
+            - Ask Copilot: "Remember that I prefer detailed docstrings and use pytest for testing"
+            - Copilot will remember this across all future conversations.
             """,
             on_duplicate_resources="warn",
             on_duplicate_prompts="replace",
@@ -87,6 +84,7 @@ class ModeManagerServer:
 
         # Add built-in FastMCP middleware (2.11.0)
         self.app.add_middleware(ErrorHandlingMiddleware())  # Handle errors first
+        self.app.add_middleware(RateLimitingMiddleware(max_requests_per_second=50))
         self.app.add_middleware(TimingMiddleware())  # Time actual execution
         self.app.add_middleware(LoggingMiddleware(include_payloads=True, max_payload_length=1000))
 
