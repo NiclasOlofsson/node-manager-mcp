@@ -16,11 +16,18 @@ from .simple_server import create_server
 def setup_logging(debug: bool = False) -> None:
     """Set up logging configuration."""
     level = logging.DEBUG if debug else logging.INFO
+    import os
+    import tempfile
+
     handlers: list[logging.Handler] = [logging.StreamHandler(sys.stderr)]
     try:
-        file_handler = logging.FileHandler("mode_manager.log", encoding="utf-8")
+        temp_log_dir = os.path.join(tempfile.gettempdir(), "mode_manager_logs")
+        os.makedirs(temp_log_dir, exist_ok=True)
+        log_path = os.path.join(temp_log_dir, "mode_manager.log")
+        file_handler = logging.FileHandler(log_path, encoding="utf-8")
         file_handler.setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
         handlers.append(file_handler)
+        print(f"[Mode Manager MCP] Log file: {log_path}", file=sys.stderr)
     except Exception:
         pass  # If file can't be opened, just use stderr
 

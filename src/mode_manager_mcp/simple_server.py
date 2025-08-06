@@ -79,7 +79,7 @@ class ModeManagerServer:
         self.instruction_manager = InstructionManager(prompts_dir=prompts_dir)
 
         # Allow library URL to be configured via parameter, environment variable, or use default
-        final_library_url = library_url or os.getenv("MCP_LIBRARY_URL") or "https://raw.githubusercontent.com/NiclasOlofsson/node-manager-mcp/refs/heads/main/library/memory-mode-library.json"
+        final_library_url = library_url or os.getenv("MCP_LIBRARY_URL") or "https://raw.githubusercontent.com/NiclasOlofsson/mode-manager-mcp/refs/heads/main/library/memory-mode-library.json"
         self.library_manager = LibraryManager(library_url=final_library_url, prompts_dir=prompts_dir)
 
         self.read_only = os.getenv("MCP_CHATMODE_READ_ONLY", "false").lower() == "true"

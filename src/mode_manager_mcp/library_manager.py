@@ -32,7 +32,7 @@ class LibraryManager:
             prompts_dir: Custom prompts directory for all managers (optional)
         """
         # Default to the official Mode Manager MCP library in the GitHub repository
-        self.library_url = library_url or "https://raw.githubusercontent.com/NiclasOlofsson/node-manager-mcp/refs/heads/main/library/memory-mode-library.json"
+        self.library_url = library_url or "https://raw.githubusercontent.com/NiclasOlofsson/mode-manager-mcp/refs/heads/main/library/memory-mode-library.json"
 
         self.chatmode_manager = ChatModeManager(prompts_dir=prompts_dir)
         self.instruction_manager = InstructionManager(prompts_dir=prompts_dir)
