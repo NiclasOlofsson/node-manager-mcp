@@ -18,7 +18,8 @@ from fastmcp.server.middleware.error_handling import ErrorHandlingMiddleware
 from fastmcp.server.middleware.logging import LoggingMiddleware
 from fastmcp.server.middleware.rate_limiting import RateLimitingMiddleware
 from fastmcp.server.middleware.timing import TimingMiddleware
-from pydantic import BaseModel, Field
+from mcp.types import TextContent
+from pydantic import BaseModel
 
 from .chatmode_manager import ChatModeManager
 from .instruction_manager import INSTRUCTION_FILE_EXTENSION, InstructionManager
@@ -123,18 +124,9 @@ class ModeManagerServer:
             },
         )
         def create_instruction(
-            instruction_name: Annotated[
-                str,
-                Field(description="The name for the new instruction (with or without extension)"),
-            ],
-            description: Annotated[
-                str,
-                Field(description="A brief description of what this instruction does"),
-            ],
-            content: Annotated[
-                str,
-                Field(description="The main content/instructions in markdown format"),
-            ],
+            instruction_name: Annotated[str, "The name for the new instruction (with or without extension)"],
+            description: Annotated[str, "A brief description of what this instruction does"],
+            content: Annotated[str, "The main content/instructions in markdown format"],
         ) -> str:
             """Create a new VS Code .instructions.md file with the specified description and content."""
             if read_only:
@@ -200,7 +192,7 @@ class ModeManagerServer:
             },
         )
         def get_instruction(
-            instruction_name: Annotated[str, Field(description="Name of the instruction (without extension)")],
+            instruction_name: Annotated[str, "Name of the instruction (without extension)"],
         ) -> str:
             """Get the raw content of a VS Code .instructions.md file."""
             try:
@@ -232,18 +224,9 @@ class ModeManagerServer:
             },
         )
         def update_instruction(
-            instruction_name: Annotated[
-                str,
-                Field(description="The name of the instruction to update (with or without extension)"),
-            ],
-            description: Annotated[
-                Optional[str],
-                Field(description="Optional new description for the instruction"),
-            ] = None,
-            content: Annotated[
-                Optional[str],
-                Field(description="Optional new content for the instruction"),
-            ] = None,
+            instruction_name: Annotated[str, "The name of the instruction to update (with or without extension)"],
+            description: Annotated[Optional[str], "Optional new description for the instruction"] = None,
+            content: Annotated[Optional[str], "Optional new content for the instruction"] = None,
         ) -> str:
             """Update an existing VS Code .instructions.md file with new description or content."""
             if read_only:
@@ -275,10 +258,7 @@ class ModeManagerServer:
             },
         )
         def delete_instruction(
-            instruction_name: Annotated[
-                str,
-                Field(description="The name of the instruction to delete (with or without extension)"),
-            ],
+            instruction_name: Annotated[str, "The name of the instruction to delete (with or without extension)"],
         ) -> str:
             """Delete a VS Code .instructions.md file from the prompts directory."""
             if read_only:
@@ -315,19 +295,10 @@ class ModeManagerServer:
             },
         )
         def create_chatmode(
-            filename: Annotated[
-                str,
-                Field(description="The filename for the new chatmode (with or without extension)"),
-            ],
-            description: Annotated[str, Field(description="A brief description of what this chatmode does")],
-            content: Annotated[
-                str,
-                Field(description="The main content/instructions for the chatmode in markdown format"),
-            ],
-            tools: Annotated[
-                Optional[str],
-                Field(description="Optional comma-separated list of tool names"),
-            ] = None,
+            filename: Annotated[str, "The filename for the new chatmode (with or without extension)"],
+            description: Annotated[str, "A brief description of what this chatmode does"],
+            content: Annotated[str, "The main content/instructions for the chatmode in markdown format"],
+            tools: Annotated[Optional[str], "Optional comma-separated list of tool names"] = None,
         ) -> str:
             """Create a new VS Code .chatmode.md file with the specified description, content, and tools."""
             if read_only:
@@ -394,10 +365,7 @@ class ModeManagerServer:
             },
         )
         def get_chatmode(
-            filename: Annotated[
-                str,
-                Field(description="The filename of the chatmode to retrieve (with or without extension)"),
-            ],
+            filename: Annotated[str, "The filename of the chatmode to retrieve (with or without extension)"],
         ) -> str:
             """Get the raw content of a VS Code .chatmode.md file."""
             try:
@@ -429,22 +397,10 @@ class ModeManagerServer:
             },
         )
         def update_chatmode(
-            filename: Annotated[
-                str,
-                Field(description="The filename of the chatmode to update (with or without extension)"),
-            ],
-            description: Annotated[
-                Optional[str],
-                Field(description="Optional new description for the chatmode"),
-            ] = None,
-            content: Annotated[
-                Optional[str],
-                Field(description="Optional new content for the chatmode"),
-            ] = None,
-            tools: Annotated[
-                Optional[str],
-                Field(description="Optional new comma-separated list of tool names"),
-            ] = None,
+            filename: Annotated[str, "The filename of the chatmode to update (with or without extension)"],
+            description: Annotated[Optional[str], "Optional new description for the chatmode"] = None,
+            content: Annotated[Optional[str], "Optional new content for the chatmode"] = None,
+            tools: Annotated[Optional[str], "Optional new comma-separated list of tool names"] = None,
         ) -> str:
             """Update an existing VS Code .chatmode.md file with new description, content, or tools."""
             if read_only:
@@ -481,10 +437,7 @@ class ModeManagerServer:
             },
         )
         def delete_chatmode(
-            filename: Annotated[
-                str,
-                Field(description="The filename of the chatmode to delete (with or without extension)"),
-            ],
+            filename: Annotated[str, "The filename of the chatmode to delete (with or without extension)"],
         ) -> str:
             """Delete a VS Code .chatmode.md file from the prompts directory."""
             if read_only:
@@ -514,10 +467,7 @@ class ModeManagerServer:
             },
         )
         def update_chatmode_from_source(
-            filename: Annotated[
-                str,
-                Field(description="The filename of the chatmode to update from source (with or without extension)"),
-            ],
+            filename: Annotated[str, "The filename of the chatmode to update from source (with or without extension)"],
         ) -> str:
             """Update a .chatmode.md file from its source definition."""
             return "Not implemented"
@@ -572,8 +522,8 @@ class ModeManagerServer:
             meta={"category": "library"},
         )
         def browse_mode_library(
-            category: Annotated[Optional[str], Field(description="Optional category filter")] = None,
-            search: Annotated[Optional[str], Field(description="Optional search term")] = None,
+            category: Annotated[Optional[str], "Optional category filter"] = None,
+            search: Annotated[Optional[str], "Optional search term"] = None,
         ) -> str:
             """Browse the Mode Manager MCP Library and filter by category or search term."""
             try:
@@ -646,14 +596,8 @@ class ModeManagerServer:
             meta={"category": "library"},
         )
         def install_from_library(
-            name: Annotated[
-                str,
-                Field(description="The name of the item to install from the library"),
-            ],
-            filename: Annotated[
-                Optional[str],
-                Field(description="Optional custom filename for the installed item"),
-            ] = None,
+            name: Annotated[str, "The name of the item to install from the library"],
+            filename: Annotated[Optional[str], "Optional custom filename for the installed item"] = None,
         ) -> str:
             """Install a chatmode or instruction from the Mode Manager MCP Library."""
             if read_only:
@@ -720,7 +664,7 @@ class ModeManagerServer:
             },
             meta={"category": "memory"},
         )
-        async def remember(ctx: Context, memory_item: Annotated[str, Field(description="The information to remember")]) -> str:
+        async def remember(ctx: Context, memory_item: Annotated[str, "The information to remember"]) -> str:
             """Store a memory item in your personal AI memory for future conversations."""
             if read_only:
                 return "Error: Server is running in read-only mode"
@@ -745,8 +689,10 @@ class ModeManagerServer:
                 new_memory_entry = f"- {timestamp}: {memory_item}\n"
 
                 memory_content = instruction_manager.get_raw_instruction(memory_filename)
-                response = await ctx.sample(
-                    """Please analyze and optimize content below for LLM compliance and effectiveness.
+                # Try AI optimization if sampling is available, otherwise just append
+                try:
+                    response = await ctx.sample(
+                        """Please analyze and optimize content below for LLM compliance and effectiveness.
 
                     Remove redundancy, clarify ambiguous rules, and ensure all laws are explicit, numbered, and clearly labeled as “Law,” “Policy,” or “Suggestion/Hint.”
                     Separate universal laws, project-specific exceptions, policies, preferences, suggestions/hints, and memories/facts.
@@ -761,16 +707,28 @@ class ModeManagerServer:
                     You must only return the content and no other text.
                     This is the content I want you to analyze and optimize:
                     """
-                    + memory_content
-                    + "\n"
-                    + new_memory_entry,
-                    temperature=0.2,  # Lower temperature for more repeatable outcomes
-                    max_tokens=1500,
-                    model_preferences="gtp-4.1",
-                )
-                logger.info(f"Proposed optimization for memory file\n{response}")
+                        + memory_content
+                        + "\n"
+                        + new_memory_entry,
+                        temperature=0.2,  # Lower temperature for more repeatable outcomes
+                        max_tokens=1500,
+                        model_preferences="gtp-4.1",
+                    )
+                    logger.info(f"Proposed optimization for memory file\n{response}")
 
-                instruction_manager.update_instruction(memory_filename, content=response.text)
+                    if not isinstance(response, TextContent):
+                        logger.error(f"AI response was not TextContent, but {type(response)}")
+                        # Fallback to simple append
+                        updated_content = memory_content + "\n" + new_memory_entry
+                    else:
+                        updated_content = response.text
+
+                except Exception as e:
+                    logger.info(f"AI sampling not available or failed: {e}. Using simple append.")
+                    # Fallback to simple append
+                    updated_content = memory_content + "\n" + new_memory_entry
+
+                instruction_manager.update_instruction(memory_filename, content=updated_content)
 
                 return f"Remembered: {memory_item}\nThis memory will be available to AI assistants when the memory instruction is active in VS Code."
             except Exception as e:
