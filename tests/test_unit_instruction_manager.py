@@ -29,7 +29,7 @@ def test_instruction_manager_format_and_frontmatter(prompts_dir: str) -> None:
 
     # Check frontmatter keys
     assert "applyTo" in frontmatter
-    assert frontmatter["applyTo"] == "'**'"
+    assert frontmatter["applyTo"] == "**"
     assert "description" in frontmatter
     assert frontmatter["description"] == description
 
@@ -37,5 +37,25 @@ def test_instruction_manager_format_and_frontmatter(prompts_dir: str) -> None:
     assert file_content.startswith("# Personal AI Memory")
     assert "This is a test instruction file." in file_content
 
+    # Clean up
+    assert im.delete_instruction(filename) is True
+
+
+def test_instruction_yaml_output_format(prompts_dir: str) -> None:
+    """Test that the actual YAML output uses single quotes for applyTo field."""
+    im = InstructionManager(prompts_dir=prompts_dir)
+    filename = "yaml_format_test.instructions.md"
+    description = "Test YAML formatting"
+    content = "# Test Content"
+    
+    assert im.create_instruction(filename, description, content) is True
+    
+    # Read the raw file content to check YAML formatting
+    file_path = im.prompts_dir / filename
+    raw_content = file_path.read_text()
+    
+    # Check that applyTo uses single quotes in the actual YAML
+    assert "applyTo: '**'" in raw_content, f"Expected 'applyTo: **' in YAML, but got:\n{raw_content}"
+    
     # Clean up
     assert im.delete_instruction(filename) is True

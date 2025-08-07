@@ -45,11 +45,11 @@ class InstructionManager:
         # Ensure prompts directory exists
         self.prompts_dir.mkdir(parents=True, exist_ok=True)
 
-        # Workspace prompts directory (current working directory + .vscode/prompts)
-        self.workspace_prompts_dir = Path(os.getcwd()) / ".vscode" / "prompts"
+        # Workspace instructions directory (current working directory + .github/instructions)
+        self.workspace_prompts_dir = Path(os.getcwd()) / ".github" / "instructions"
 
         logger.info(f"Instruction manager initialized with prompts directory: {self.prompts_dir}")
-        logger.info(f"Workspace prompts directory: {self.workspace_prompts_dir}")
+        logger.info(f"Workspace instructions directory: {self.workspace_prompts_dir}")
 
     def _get_prompts_dir(self, scope: MemoryScope = MemoryScope.user) -> Path:
         """Get the appropriate prompts directory based on scope."""
@@ -57,8 +57,8 @@ class InstructionManager:
             return self.workspace_prompts_dir
         return self.prompts_dir
 
-    def _ensure_workspace_prompts_dir(self) -> None:
-        """Ensure workspace prompts directory exists."""
+    def _ensure_workspace_instructions_dir(self) -> None:
+        """Ensure workspace instructions directory exists."""
         self.workspace_prompts_dir.mkdir(parents=True, exist_ok=True)
 
     def _get_apply_to_pattern(self, language: Optional[str] = None) -> str:
@@ -89,7 +89,7 @@ class InstructionManager:
             FileOperationError: If operation fails
         """
         if scope == MemoryScope.workspace:
-            self._ensure_workspace_prompts_dir()
+            self._ensure_workspace_instructions_dir()
 
         prompts_dir = self._get_prompts_dir(scope)
         apply_to_pattern = self._get_apply_to_pattern(language)
@@ -329,7 +329,7 @@ class InstructionManager:
             raise FileOperationError(f"Instruction file already exists: {instruction_name}")
 
         # Create frontmatter with applyTo field so instructions are actually applied
-        frontmatter: Dict[str, Any] = {"applyTo": "'**'", "description": description}
+        frontmatter: Dict[str, Any] = {"applyTo": "**", "description": description}
 
         try:
             success = write_frontmatter_file(file_path, frontmatter, content, create_backup=False)

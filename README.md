@@ -140,7 +140,7 @@ it works under the hood:
   Stored in a user-specific file (`memory.instructions.md`) in your VS Code prompts directory. This is your private memory—preferences, habits, and facts that follow you across all projects.
 
 - **Workspace (Team) Memory:**  
-  Stored in a workspace-level file (also `memory.instructions.md`, but in the workspace’s `.vscode/prompts` directory). This is shared with everyone working in the same repo, so team conventions and onboarding notes are always available.
+  Stored in a workspace-level file (also `memory.instructions.md`, but in the workspace’s `.github/instructions` directory). This is shared with everyone working in the same repo, so team conventions and onboarding notes are always available.
 
 - **Language-Specific Memory:**  
   Stored in files like `memory-python.instructions.md`, `memory-csharp.instructions.md`, etc. These are automatically loaded when you’re working in a particular language, so language tips and conventions are always at hand.

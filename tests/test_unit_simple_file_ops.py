@@ -218,3 +218,41 @@ Content.
 
         # Test that all three approaches produce the same semantic result
         assert frontmatter["applyTo"] == "**"
+
+
+def test_write_frontmatter_file_glob_patterns() -> None:
+    """Test that YAML frontmatter handles glob patterns correctly."""
+    import tempfile
+    from pathlib import Path
+    from mode_manager_mcp.simple_file_ops import write_frontmatter_file
+    
+    temp_file = Path(tempfile.mktemp())
+
+    # Test different glob patterns and quoting behavior
+    test_cases = [
+        # (value, expected_in_yaml, description)
+        ("**", "applyTo: '**'", "Bare ** should be quoted"),
+        ("**/*.py", "applyTo: '**/*.py'", "Glob pattern should be quoted per GitHub requirements"),
+        ("**/src/**", "applyTo: '**/src/**'", "Complex glob pattern should be quoted per GitHub requirements"),
+        ("*/test.js", "applyTo: '*/test.js'", "Simple glob pattern should be quoted per GitHub requirements"),
+        ("Test: description", "description: 'Test: description'", "String with colon should be quoted"),
+    ]
+    
+    for value, expected_yaml, description in test_cases:
+        if "applyTo" in expected_yaml:
+            frontmatter = {"applyTo": value}
+        else:
+            frontmatter = {"description": value}
+        
+        content = "Test content"
+        
+        # Write file
+        assert write_frontmatter_file(temp_file, frontmatter, content, create_backup=False) is True
+        
+        # Read raw content and check formatting
+        raw_content = temp_file.read_text()
+        assert expected_yaml in raw_content, f"{description}: Expected '{expected_yaml}' in:\n{raw_content}"
+    
+    # Clean up
+    if temp_file.exists():
+        temp_file.unlink()

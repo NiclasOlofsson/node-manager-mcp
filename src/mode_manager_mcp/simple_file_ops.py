@@ -147,16 +147,12 @@ def write_frontmatter_file(
                 # Format list as JSON array for simplicity
                 frontmatter_lines.append(f"{key}: {json.dumps(value)}")
             elif isinstance(value, str):
-                # Quote strings that contain special characters or YAML special sequences
-                # Special case: Don't quote glob patterns that are valid VS Code applyTo patterns
-                is_glob_pattern = (
-                    value.startswith(("**/", "*/", "**")) 
-                    and all(c.isalnum() or c in "*?/.,-_" for c in value)
-                )
-                
-                needs_quoting = (
-                    not is_glob_pattern
-                    and (
+                # Special case: Always quote applyTo values per GitHub requirements
+                if key == "applyTo":
+                    frontmatter_lines.append(f"{key}: '{value}'")
+                else:
+                    # Quote other strings that contain special characters or YAML special sequences
+                    needs_quoting = (
                         ":" in value
                         or "\n" in value
                         or value.startswith(('"', "'"))
@@ -165,12 +161,11 @@ def write_frontmatter_file(
                         or value.endswith(("*", "?"))
                         or value.strip() != value  # Has leading/trailing whitespace
                     )
-                )
 
-                if needs_quoting:
-                    frontmatter_lines.append(f'{key}: "{value}"')
-                else:
-                    frontmatter_lines.append(f"{key}: {value}")
+                    if needs_quoting:
+                        frontmatter_lines.append(f"{key}: '{value}'")
+                    else:
+                        frontmatter_lines.append(f"{key}: {value}")
             elif isinstance(value, bool):
                 frontmatter_lines.append(f"{key}: {str(value).lower()}")
             else:
