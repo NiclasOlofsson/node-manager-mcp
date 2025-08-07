@@ -5,7 +5,7 @@
 </picture>
 
 
-# Meet Mode Manager MCP: Real Memory for You, Your Team, and Your AI
+# Meet #remember -- Real Memory for You, Your Team, and Your AI
 
 [![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_Server-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=modemanager&config=%7B%22command%22%3A%22pipx%22%2C%22args%22%3A%5B%22run%22%2C%22mode-manager-mcp%22%5D%7D)
 [![Install in VS Code Insiders](https://img.shields.io/badge/VS_Code_Insiders-Install_Server-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=modemanager&config=%7B%22command%22%3A%22pipx%22%2C%22args%22%3A%5B%22run%22%2C%22mode-manager-mcp%22%5D%7D&quality=insiders)
@@ -179,10 +179,6 @@ MCP is flexible and understands a wide range of phrasing. You don’t have to sa
 “repo,” or even just describing something as a team convention. Whether you’re 
 making a personal note, a team guideline, or a language-specific tip, just say it 
 in your own words—Mode Manager MCP figures out what you want to remember and where it belongs.
-
-
-## Bonus Features
-
 
 ## Wait, There’s More: Power Prompts & Custom Modes
 
