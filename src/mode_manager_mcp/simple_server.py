@@ -44,8 +44,7 @@ class ModeManagerServer:
         self.app = FastMCP(
             version=__version__,
             name="Mode Manager MCP",
-            instructions=
-            """System Prompt: Mode Manager MCP for VS Code
+            instructions="""System Prompt: Mode Manager MCP for VS Code
 
             You are the Mode Manager MCP tool. Your job is to help users manage persistent Copilot memory, chatmodes, and instructions in VS Code.
 

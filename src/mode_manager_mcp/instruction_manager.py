@@ -7,6 +7,7 @@ and workspace-specific AI guidance for VS Code Copilot.
 
 import json
 import logging
+import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
@@ -18,6 +19,7 @@ from .simple_file_ops import (
     safe_delete_file,
     write_frontmatter_file,
 )
+from .types import LanguagePattern, MemoryScope
 
 logger = logging.getLogger(__name__)
 
@@ -26,47 +28,7 @@ INSTRUCTION_FILE_EXTENSION = ".instructions.md"
 
 
 class InstructionManager:
-    def append_to_section(
-        self,
-        instruction_name: str,
-        section_header: str,
-        new_entry: str,
-    ) -> bool:
-        """
-        Append a new entry to the end of an instruction file (fast append).
-
-        Args:
-            instruction_name: Name of the .instructions.md file
-            section_header: Ignored (kept for compatibility)
-            new_entry: Content to append (should include any formatting, e.g., '- ...')
-
-        Returns:
-            True if successful
-
-        Raises:
-            FileOperationError: If file cannot be updated
-        """
-        if not instruction_name.endswith(INSTRUCTION_FILE_EXTENSION):
-            instruction_name += INSTRUCTION_FILE_EXTENSION
-
-        file_path = self.prompts_dir / instruction_name
-
-        if not file_path.exists():
-            raise FileOperationError(f"Instruction file not found: {instruction_name}")
-
-        try:
-            with open(file_path, "a", encoding="utf-8") as f:
-                # Ensure entry ends with a newline
-                entry = new_entry if new_entry.endswith("\n") else new_entry + "\n"
-                f.write(entry)
-            logger.info(f"Appended entry to end of: {instruction_name}")
-            return True
-        except Exception as e:
-            raise FileOperationError(f"Error appending entry to {instruction_name}: {e}")
-
-    """
-    Manages VS Code .instructions.md files in the prompts directory.
-    """
+    """Manages VS Code .instructions.md files in both user and workspace prompts directories."""
 
     def __init__(self, prompts_dir: Optional[Union[str, Path]] = None):
         """
@@ -83,21 +45,161 @@ class InstructionManager:
         # Ensure prompts directory exists
         self.prompts_dir.mkdir(parents=True, exist_ok=True)
 
-        logger.info(f"Instruction manager initialized with prompts directory: {self.prompts_dir}")
+        # Workspace prompts directory (current working directory + .vscode/prompts)
+        self.workspace_prompts_dir = Path(os.getcwd()) / ".vscode" / "prompts"
 
-    def list_instructions(self) -> List[Dict[str, Any]]:
+        logger.info(f"Instruction manager initialized with prompts directory: {self.prompts_dir}")
+        logger.info(f"Workspace prompts directory: {self.workspace_prompts_dir}")
+
+    def _get_prompts_dir(self, scope: MemoryScope = MemoryScope.user) -> Path:
+        """Get the appropriate prompts directory based on scope."""
+        if scope == MemoryScope.workspace:
+            return self.workspace_prompts_dir
+        return self.prompts_dir
+
+    def _ensure_workspace_prompts_dir(self) -> None:
+        """Ensure workspace prompts directory exists."""
+        self.workspace_prompts_dir.mkdir(parents=True, exist_ok=True)
+
+    def _get_apply_to_pattern(self, language: Optional[str] = None) -> str:
+        """Get the appropriate applyTo pattern based on language."""
+        if not language:
+            return LanguagePattern.get_all_pattern()
+
+        return LanguagePattern.get_pattern(language)
+
+    def create_memory(
+        self,
+        memory_item: str,
+        scope: MemoryScope = MemoryScope.user,
+        language: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """
+        Create or append to a memory instruction file.
+
+        Args:
+            memory_item: The memory item to store
+            scope: "user" or "workspace"
+            language: Optional language for language-specific memory
+
+        Returns:
+            Dict with operation result details
+
+        Raises:
+            FileOperationError: If operation fails
+        """
+        if scope == MemoryScope.workspace:
+            self._ensure_workspace_prompts_dir()
+
+        prompts_dir = self._get_prompts_dir(scope)
+        apply_to_pattern = self._get_apply_to_pattern(language)
+
+        # Determine filename based on scope and language
+        if language:
+            filename = f"memory-{language.lower()}{INSTRUCTION_FILE_EXTENSION}"
+            description = f"Personal AI memory for {language} development"
+        else:
+            filename = f"memory{INSTRUCTION_FILE_EXTENSION}"
+            if scope == MemoryScope.workspace:
+                description = "Workspace-specific AI memory for this project"
+            else:
+                description = "Personal AI memory for conversations and preferences"
+
+        file_path = prompts_dir / filename
+
+        # Create file if it doesn't exist
+        if not file_path.exists():
+            initial_content = f"# {'Workspace' if scope == MemoryScope.workspace else 'Personal'} AI Memory"
+            if language:
+                initial_content += f" - {language.title()}"
+            initial_content += f"\nThis file contains {'workspace-specific' if scope == MemoryScope.workspace else 'personal'} information for AI conversations."
+            if language:
+                initial_content += f" Specifically for {language} development."
+            initial_content += "\n\n## Memories\n"
+
+            frontmatter = {"applyTo": apply_to_pattern, "description": description}
+
+            success = write_frontmatter_file(file_path, frontmatter, initial_content, create_backup=False)
+            if not success:
+                raise FileOperationError(f"Failed to create memory file: {filename}")
+
+        # Append the memory item
+        import datetime
+
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+        new_memory_entry = f"- **{timestamp}:** {memory_item}\n"
+
+        success = self.append_to_section(filename, "Memories", new_memory_entry, scope)
+        if not success:
+            raise FileOperationError(f"Failed to append memory to: {filename}")
+
+        return {
+            "status": "success",
+            "filename": filename,
+            "scope": scope,
+            "language": language,
+            "path": str(file_path),
+            "apply_to": apply_to_pattern,
+        }
+
+    def append_to_section(
+        self,
+        instruction_name: str,
+        section_header: str,
+        new_entry: str,
+        scope: MemoryScope = MemoryScope.user,
+    ) -> bool:
+        """
+        Append a new entry to the end of an instruction file (fast append).
+
+        Args:
+            instruction_name: Name of the .instructions.md file
+            section_header: Ignored (kept for compatibility)
+            new_entry: Content to append (should include any formatting, e.g., '- ...')
+            scope: "user" or "workspace" to determine which directory to use
+
+        Returns:
+            True if successful
+
+        Raises:
+            FileOperationError: If file cannot be updated
+        """
+        if not instruction_name.endswith(INSTRUCTION_FILE_EXTENSION):
+            instruction_name += INSTRUCTION_FILE_EXTENSION
+
+        prompts_dir = self._get_prompts_dir(scope)
+        file_path = prompts_dir / instruction_name
+
+        if not file_path.exists():
+            raise FileOperationError(f"Instruction file not found: {instruction_name}")
+
+        try:
+            with open(file_path, "a", encoding="utf-8") as f:
+                # Ensure entry ends with a newline
+                entry = new_entry if new_entry.endswith("\n") else new_entry + "\n"
+                f.write(entry)
+            logger.info(f"Appended entry to end of: {instruction_name}")
+            return True
+        except Exception as e:
+            raise FileOperationError(f"Error appending entry to {instruction_name}: {e}")
+
+    def list_instructions(self, scope: MemoryScope = MemoryScope.user) -> List[Dict[str, Any]]:
         """
         List all .instructions.md files in the prompts directory.
+
+        Args:
+            scope: "user" or "workspace" to determine which directory to list
 
         Returns:
             List of instruction file information
         """
         instructions: List[Dict[str, Any]] = []
 
-        if not self.prompts_dir.exists():
+        prompts_dir = self._get_prompts_dir(scope)
+        if not prompts_dir.exists():
             return instructions
 
-        for file_path in self.prompts_dir.glob(f"*{INSTRUCTION_FILE_EXTENSION}"):
+        for file_path in prompts_dir.glob(f"*{INSTRUCTION_FILE_EXTENSION}"):
             try:
                 frontmatter, content = parse_frontmatter_file(file_path)
 
@@ -113,6 +215,7 @@ class InstructionManager:
                     "content_preview": content_preview,
                     "size": file_path.stat().st_size,
                     "modified": file_path.stat().st_mtime,
+                    "scope": scope,
                 }
 
                 instructions.append(instruction_info)
@@ -125,12 +228,13 @@ class InstructionManager:
         instructions.sort(key=lambda x: x["name"].lower())
         return instructions
 
-    def get_instruction(self, instruction_name: str) -> Dict[str, Any]:
+    def get_instruction(self, instruction_name: str, scope: MemoryScope = MemoryScope.user) -> Dict[str, Any]:
         """
         Get content and metadata of a specific instruction file.
 
         Args:
             instruction_name: Name of the .instructions.md file
+            scope: "user" or "workspace" to determine which directory to use
 
         Returns:
             Instruction data including frontmatter and content
@@ -143,7 +247,8 @@ class InstructionManager:
         if not instruction_name.endswith(INSTRUCTION_FILE_EXTENSION):
             instruction_name += INSTRUCTION_FILE_EXTENSION
 
-        file_path = self.prompts_dir / instruction_name
+        prompts_dir = self._get_prompts_dir(scope)
+        file_path = prompts_dir / instruction_name
 
         if not file_path.exists():
             raise FileOperationError(f"Instruction file not found: {instruction_name}")
@@ -160,17 +265,19 @@ class InstructionManager:
                 "content": content,
                 "size": file_path.stat().st_size,
                 "modified": file_path.stat().st_mtime,
+                "scope": scope,
             }
 
         except Exception as e:
             raise FileOperationError(f"Error reading instruction file {instruction_name}: {e}")
 
-    def get_raw_instruction(self, instruction_name: str) -> str:
+    def get_raw_instruction(self, instruction_name: str, scope: MemoryScope = MemoryScope.user) -> str:
         """
         Get the raw file content of a specific instruction file without any processing.
 
         Args:
             instruction_name: Name of the .instructions.md file
+            scope: "user" or "workspace" to determine which directory to use
 
         Returns:
             Raw file content as string
@@ -183,7 +290,8 @@ class InstructionManager:
         if not instruction_name.endswith(INSTRUCTION_FILE_EXTENSION):
             instruction_name += INSTRUCTION_FILE_EXTENSION
 
-        file_path = self.prompts_dir / instruction_name
+        prompts_dir = self._get_prompts_dir(scope)
+        file_path = prompts_dir / instruction_name
 
         if not file_path.exists():
             raise FileOperationError(f"Instruction file not found: {instruction_name}")

@@ -148,14 +148,23 @@ def write_frontmatter_file(
                 frontmatter_lines.append(f"{key}: {json.dumps(value)}")
             elif isinstance(value, str):
                 # Quote strings that contain special characters or YAML special sequences
+                # Special case: Don't quote glob patterns that are valid VS Code applyTo patterns
+                is_glob_pattern = (
+                    value.startswith(("**/", "*/", "**")) 
+                    and all(c.isalnum() or c in "*?/.,-_" for c in value)
+                )
+                
                 needs_quoting = (
-                    ":" in value
-                    or "\n" in value
-                    or value.startswith(('"', "'"))
-                    or value in ("**", "*", "?", "|", ">", "@", "`")  # YAML special chars
-                    or value.startswith(("*", "?", "[", "{", "!", "&", "|", ">", "@", "`"))
-                    or value.endswith(("*", "?"))
-                    or value.strip() != value  # Has leading/trailing whitespace
+                    not is_glob_pattern
+                    and (
+                        ":" in value
+                        or "\n" in value
+                        or value.startswith(('"', "'"))
+                        or value in ("**", "*", "?", "|", ">", "@", "`")  # YAML special chars
+                        or value.startswith(("[", "{", "!", "&", "|", ">", "@", "`"))
+                        or value.endswith(("*", "?"))
+                        or value.strip() != value  # Has leading/trailing whitespace
+                    )
                 )
 
                 if needs_quoting:

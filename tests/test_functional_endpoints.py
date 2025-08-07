@@ -8,11 +8,10 @@ from mode_manager_mcp.path_utils import get_vscode_prompts_directory
 from mode_manager_mcp.simple_server import ModeManagerServer
 
 
-@pytest.fixture(scope="module")
-def server() -> ModeManagerServer:
+@pytest.fixture()
+def server(global_patch_and_tempdir: str) -> ModeManagerServer:
     os.environ["MCP_CHATMODE_READ_ONLY"] = "false"
-    s = ModeManagerServer()
-    return s
+    return ModeManagerServer(prompts_dir=global_patch_and_tempdir)
 
 
 @pytest.mark.asyncio

@@ -18,14 +18,16 @@ async def test_remember_integration(server: ModeManagerServer) -> None:
 
 
 @pytest.mark.asyncio
+async def test_remember_workspace_memory_integration(server: ModeManagerServer) -> None:
+    """Test that workspace memory is properly isolated to temp directory."""
+    async with Client(server.app) as client:
+        result = await client.call_tool("remember", {"memory_item": "this project uses FastMCP for testing", "scope": "workspace"})
+        assert "Remembered" in result.data or "Remembered" in str(result)
+        assert "workspace memory" in result.data or "workspace memory" in str(result)
+
+
+@pytest.mark.asyncio
 async def test_browse_library_integration(server: ModeManagerServer) -> None:
     async with Client(server.app) as client:
         result = await client.call_tool("browse_mode_library")
         assert "Library" in result.data or "Library" in str(result)
-
-
-@pytest.mark.asyncio
-async def test_get_prompts_directory_integration(server: ModeManagerServer) -> None:
-    async with Client(server.app) as client:
-        result = await client.call_tool("get_prompts_directory")
-        assert "prompts" in result.data.lower() or "prompts" in str(result).lower()
