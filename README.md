@@ -1,7 +1,7 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="logo-dark-theme.svg">
-  <source media="(prefers-color-scheme: light)" srcset="logo-light-theme.svg">
-  <img alt="GitHub Copilot Memory Tool" src="https://raw.githubusercontent.com/NiclasOlofsson/mode-manager-mcp/refs/heads/main/logo-light-theme.svg" width="800">
+  <source media="(prefers-color-scheme: dark)" srcset="remember-new-logo-complete-white.svg">
+  <source media="(prefers-color-scheme: light)" srcset="remember-new-logo-complete-black.svg">
+  <img alt="GitHub Copilot Memory Tool" src="https://raw.githubusercontent.com/NiclasOlofsson/mode-manager-mcp/refs/heads/main/remember-new-logo-complete-black.svg" width="800">
 </picture>
 
 
