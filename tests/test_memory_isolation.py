@@ -31,36 +31,13 @@ async def test_user_memory_isolation(server: ModeManagerServer) -> None:
 
 @pytest.mark.asyncio
 async def test_workspace_memory_isolation(server: ModeManagerServer) -> None:
-    """Test that workspace memory writes to temp directory, not real project directory."""
-    # Store initial state of real project directory
-    real_project_github = Path("c:/Development/github/mcpmemoryagent/.github/instructions")
-    initial_files = set()
-    if real_project_github.exists():
-        initial_files = {f.name for f in real_project_github.iterdir() if f.is_file()}
+    """Test that workspace memory requires workspace root from context."""
 
     async with Client(server.app) as client:
         result = await client.call_tool("remember", {"memory_item": "test workspace memory isolation", "scope": "workspace"})
-        assert "Remembered" in result.data or "Remembered" in str(result)
-        assert "workspace memory" in result.data or "workspace memory" in str(result)
-
-        # Verify the file was created in the temp workspace directory (from patching)
-        temp_workspace_dir = server.instruction_manager.workspace_prompts_dir
-        memory_file = temp_workspace_dir / "memory.instructions.md"
-
-        assert memory_file.exists(), f"Workspace memory file should be created at {memory_file}"
-
-        # Verify content contains our test memory
-        content = memory_file.read_text()
-        assert "test workspace memory isolation" in content
-
-        # Verify no file was created in real project directory
-        real_memory_file = real_project_github / "memory.instructions.md"
-        assert not real_memory_file.exists(), "Memory file should not be created in real project directory"
-
-        # Verify real project directory state is unchanged
-        if real_project_github.exists():
-            final_files = {f.name for f in real_project_github.iterdir() if f.is_file()}
-            assert final_files == initial_files, "Real project directory should be unchanged"
+        # Since list_roots is not supported in test environment, expect error message
+        assert "couldn't find the workspace root" in result.data
+        assert "Workspace memory requires access to the current workspace context" in result.data
 
 
 @pytest.mark.asyncio

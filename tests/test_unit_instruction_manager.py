@@ -47,15 +47,15 @@ def test_instruction_yaml_output_format(prompts_dir: str) -> None:
     filename = "yaml_format_test.instructions.md"
     description = "Test YAML formatting"
     content = "# Test Content"
-    
+
     assert im.create_instruction(filename, description, content) is True
-    
+
     # Read the raw file content to check YAML formatting
     file_path = im.prompts_dir / filename
     raw_content = file_path.read_text()
-    
+
     # Check that applyTo uses single quotes in the actual YAML
     assert "applyTo: '**'" in raw_content, f"Expected 'applyTo: **' in YAML, but got:\n{raw_content}"
-    
+
     # Clean up
     assert im.delete_instruction(filename) is True

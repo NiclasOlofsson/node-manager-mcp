@@ -19,11 +19,12 @@ async def test_remember_integration(server: ModeManagerServer) -> None:
 
 @pytest.mark.asyncio
 async def test_remember_workspace_memory_integration(server: ModeManagerServer) -> None:
-    """Test that workspace memory is properly isolated to temp directory."""
+    """Test that workspace memory requires workspace root from context."""
     async with Client(server.app) as client:
         result = await client.call_tool("remember", {"memory_item": "this project uses FastMCP for testing", "scope": "workspace"})
-        assert "Remembered" in result.data or "Remembered" in str(result)
-        assert "workspace memory" in result.data or "workspace memory" in str(result)
+        # Since list_roots is not supported in test environment, expect error message
+        assert "couldn't find the workspace root" in result.data
+        assert "Workspace memory requires access to the current workspace context" in result.data
 
 
 @pytest.mark.asyncio

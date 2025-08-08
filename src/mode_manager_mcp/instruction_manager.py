@@ -10,6 +10,7 @@ import logging
 import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
+from urllib.parse import unquote
 
 from .path_utils import get_vscode_prompts_directory
 from .simple_file_ops import (
@@ -51,15 +52,35 @@ class InstructionManager:
         logger.info(f"Instruction manager initialized with prompts directory: {self.prompts_dir}")
         logger.info(f"Workspace instructions directory: {self.workspace_prompts_dir}")
 
-    def _get_prompts_dir(self, scope: MemoryScope = MemoryScope.user) -> Path:
+    def _get_prompts_dir(self, scope: MemoryScope = MemoryScope.user, workspace_root: Optional[str] = None) -> Path:
         """Get the appropriate prompts directory based on scope."""
         if scope == MemoryScope.workspace:
+            if workspace_root:
+                # Check if workspace_root is already decoded (doesn't contain %)
+                if "%" in workspace_root:
+                    # URL-decode the workspace root path in case it comes from a FileUrl
+                    decoded_root = unquote(workspace_root)
+                else:
+                    # Already decoded
+                    decoded_root = workspace_root
+                return Path(decoded_root) / ".github" / "instructions"
             return self.workspace_prompts_dir
         return self.prompts_dir
 
-    def _ensure_workspace_instructions_dir(self) -> None:
+    def _ensure_workspace_instructions_dir(self, workspace_root: Optional[str] = None) -> None:
         """Ensure workspace instructions directory exists."""
-        self.workspace_prompts_dir.mkdir(parents=True, exist_ok=True)
+        if workspace_root:
+            # Check if workspace_root is already decoded (doesn't contain %)
+            if "%" in workspace_root:
+                # URL-decode the workspace root path in case it comes from a FileUrl
+                decoded_root = unquote(workspace_root)
+            else:
+                # Already decoded
+                decoded_root = workspace_root
+            workspace_dir = Path(decoded_root) / ".github" / "instructions"
+            workspace_dir.mkdir(parents=True, exist_ok=True)
+        else:
+            self.workspace_prompts_dir.mkdir(parents=True, exist_ok=True)
 
     def _get_apply_to_pattern(self, language: Optional[str] = None) -> str:
         """Get the appropriate applyTo pattern based on language."""
@@ -73,6 +94,7 @@ class InstructionManager:
         memory_item: str,
         scope: MemoryScope = MemoryScope.user,
         language: Optional[str] = None,
+        workspace_root: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
         Create or append to a memory instruction file.
@@ -81,6 +103,7 @@ class InstructionManager:
             memory_item: The memory item to store
             scope: "user" or "workspace"
             language: Optional language for language-specific memory
+            workspace_root: Optional workspace root path (for workspace scope)
 
         Returns:
             Dict with operation result details
@@ -89,9 +112,14 @@ class InstructionManager:
             FileOperationError: If operation fails
         """
         if scope == MemoryScope.workspace:
-            self._ensure_workspace_instructions_dir()
+            if workspace_root is None:
+                raise FileOperationError("Workspace root is required for workspace scope memory operations")
+            # Use the provided workspace root, URL-decoded in case it comes from a FileUrl
+            decoded_root = unquote(workspace_root)
+            self.workspace_prompts_dir = Path(decoded_root) / ".github" / "instructions"
+            self._ensure_workspace_instructions_dir(decoded_root)
 
-        prompts_dir = self._get_prompts_dir(scope)
+        prompts_dir = self._get_prompts_dir(scope, workspace_root)
         apply_to_pattern = self._get_apply_to_pattern(language)
 
         # Determine filename based on scope and language
@@ -129,7 +157,7 @@ class InstructionManager:
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
         new_memory_entry = f"- **{timestamp}:** {memory_item}\n"
 
-        success = self.append_to_section(filename, "Memories", new_memory_entry, scope)
+        success = self.append_to_section(filename, "Memories", new_memory_entry, scope, workspace_root)
         if not success:
             raise FileOperationError(f"Failed to append memory to: {filename}")
 
@@ -148,6 +176,7 @@ class InstructionManager:
         section_header: str,
         new_entry: str,
         scope: MemoryScope = MemoryScope.user,
+        workspace_root: Optional[str] = None,
     ) -> bool:
         """
         Append a new entry to the end of an instruction file (fast append).
@@ -157,6 +186,7 @@ class InstructionManager:
             section_header: Ignored (kept for compatibility)
             new_entry: Content to append (should include any formatting, e.g., '- ...')
             scope: "user" or "workspace" to determine which directory to use
+            workspace_root: Optional workspace root path (for workspace scope)
 
         Returns:
             True if successful
@@ -167,7 +197,7 @@ class InstructionManager:
         if not instruction_name.endswith(INSTRUCTION_FILE_EXTENSION):
             instruction_name += INSTRUCTION_FILE_EXTENSION
 
-        prompts_dir = self._get_prompts_dir(scope)
+        prompts_dir = self._get_prompts_dir(scope, workspace_root)
         file_path = prompts_dir / instruction_name
 
         if not file_path.exists():
@@ -178,7 +208,7 @@ class InstructionManager:
                 # Ensure entry ends with a newline
                 entry = new_entry if new_entry.endswith("\n") else new_entry + "\n"
                 f.write(entry)
-            logger.info(f"Appended entry to end of: {instruction_name}")
+            logger.info(f"Appended entry to end of: {file_path}")
             return True
         except Exception as e:
             raise FileOperationError(f"Error appending entry to {instruction_name}: {e}")

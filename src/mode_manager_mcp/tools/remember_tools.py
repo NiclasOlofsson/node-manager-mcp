@@ -2,7 +2,11 @@
 
 import datetime
 import logging
+import os
+from pathlib import Path
 from typing import Annotated, Optional
+from urllib.parse import unquote, urlparse
+from urllib.request import url2pathname
 
 from fastmcp import Context
 from fastmcp.prompts.prompt import Message
@@ -53,13 +57,35 @@ async def _create_user_memory(ctx: Context, memory_item: str, language: Optional
         return {"status": "error", "message": str(e)}
 
 
-def _create_workspace_memory(memory_item: str, language: Optional[str] = None) -> dict:
-    """Create workspace-level memory."""
+async def _create_workspace_memory(ctx: Context, memory_item: str, language: Optional[str] = None) -> dict:
+    """Create workspace-level memory using the context root."""
     registry = get_server_registry()
     instruction_manager = registry.instruction_manager
 
     try:
-        result = instruction_manager.create_memory(memory_item, scope=MemoryScope.workspace, language=language)
+        # Get the workspace root from context
+        workspace_root_str: Optional[str] = None
+        try:
+            roots = await ctx.list_roots()
+            if roots:
+                # Use the first root as the workspace root
+                root_uri = roots[0].uri
+                parsed = urlparse(root_uri.encoded_string())
+                host = "{0}{0}{mnt}{0}".format(os.path.sep, mnt=parsed.netloc)
+                normpath = os.path.normpath(
+                    os.path.join(host, url2pathname(unquote(parsed.path)))
+                )
+                workspace_root_str = normpath
+        except Exception as e:
+            logger.warning(f"Failed to get workspace root from context: {e}")
+
+        logger.info(f"Using workspace root from context: {workspace_root_str}")
+
+        # If we couldn't get a workspace root, return an error
+        if workspace_root_str is None:
+            return {"status": "error", "message": "Sorry, but I couldn't find the workspace root. Workspace memory requires access to the current workspace context."}
+
+        result = instruction_manager.create_memory(memory_item, scope=MemoryScope.workspace, language=language, workspace_root=workspace_root_str)
         return result
     except Exception as e:
         return {"status": "error", "message": str(e)}
@@ -115,6 +141,14 @@ def register_remember_tools() -> None:
         if memory_item is None or memory_item.strip() == "":
             return "Error: No memory item provided."
 
+        try:
+            roots = await ctx.list_roots()
+            logger.info(f"Available roots: {', '.join(str(r) for r in roots)} - Remembering: {memory_item} (scope: {scope}, language: {language})")
+        except Exception as e:
+            # Handle case where list_roots is not supported (e.g., in tests)
+            logger.warning(f"Failed to get roots: {e} - Remembering: {memory_item} (scope: {scope}, language: {language})")
+            roots = []
+
         # Validate scope and convert to enum
         try:
             scope_enum = MemoryScope(scope)
@@ -129,7 +163,7 @@ def register_remember_tools() -> None:
             if scope_enum == MemoryScope.user:
                 result = await _create_user_memory(ctx, memory_item, language)
             else:  # workspace
-                result = _create_workspace_memory(memory_item, language)
+                result = await _create_workspace_memory(ctx, memory_item, language)
 
             if result["status"] == "success":
                 scope_desc = "workspace" if scope_enum == MemoryScope.workspace else "global"
