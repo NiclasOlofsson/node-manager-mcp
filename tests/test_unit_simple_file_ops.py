@@ -224,6 +224,7 @@ def test_write_frontmatter_file_glob_patterns() -> None:
     """Test that YAML frontmatter handles glob patterns correctly."""
     import tempfile
     from pathlib import Path
+
     from mode_manager_mcp.simple_file_ops import write_frontmatter_file
     
     temp_file = Path(tempfile.mktemp())
