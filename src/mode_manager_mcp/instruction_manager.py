@@ -28,6 +28,44 @@ logger = logging.getLogger(__name__)
 INSTRUCTION_FILE_EXTENSION = ".instructions.md"
 
 
+class MemoryFileConfig:
+    """Configuration for memory file creation."""
+
+    def __init__(self, scope: MemoryScope, language: Optional[str] = None):
+        self.scope = scope
+        self.language = language
+
+    @property
+    def filename(self) -> str:
+        """Generate the appropriate filename for the memory file."""
+        if self.language:
+            return f"memory-{self.language.lower()}{INSTRUCTION_FILE_EXTENSION}"
+        return f"memory{INSTRUCTION_FILE_EXTENSION}"
+
+    @property
+    def description(self) -> str:
+        """Generate the appropriate description for the memory file."""
+        if self.language:
+            return f"Personal AI memory for {self.language} development"
+        elif self.scope == MemoryScope.workspace:
+            return "Workspace-specific AI memory for this project"
+        else:
+            return "Personal AI memory for conversations and preferences"
+
+    @property
+    def initial_content(self) -> str:
+        """Generate the initial content for the memory file."""
+        title = f"# {'Workspace' if self.scope == MemoryScope.workspace else 'Personal'} AI Memory"
+        if self.language:
+            title += f" - {self.language.title()}"
+
+        description = f"\nThis file contains {'workspace-specific' if self.scope == MemoryScope.workspace else 'personal'} information for AI conversations."
+        if self.language:
+            description += f" Specifically for {self.language} development."
+
+        return title + description + "\n\n## Memories\n"
+
+
 class InstructionManager:
     """Manages VS Code .instructions.md files in both user and workspace prompts directories."""
 
@@ -52,32 +90,35 @@ class InstructionManager:
         logger.info(f"Instruction manager initialized with prompts directory: {self.prompts_dir}")
         logger.info(f"Workspace instructions directory: {self.workspace_prompts_dir}")
 
+    def _decode_workspace_root(self, workspace_root: Optional[str]) -> Optional[str]:
+        """Decode workspace root URL if needed."""
+        if workspace_root is None:
+            return None
+        return unquote(workspace_root) if "%" in workspace_root else workspace_root
+
+    def _ensure_instruction_extension(self, filename: str) -> str:
+        """Ensure filename has the correct .instructions.md extension."""
+        return filename if filename.endswith(INSTRUCTION_FILE_EXTENSION) else filename + INSTRUCTION_FILE_EXTENSION
+
+    def _build_workspace_instructions_path(self, workspace_root: str) -> Path:
+        """Build workspace instructions directory path."""
+        decoded_root = self._decode_workspace_root(workspace_root)
+        if decoded_root is None:
+            raise ValueError("Workspace root cannot be None")
+        return Path(decoded_root) / ".github" / "instructions"
+
     def _get_prompts_dir(self, scope: MemoryScope = MemoryScope.user, workspace_root: Optional[str] = None) -> Path:
         """Get the appropriate prompts directory based on scope."""
         if scope == MemoryScope.workspace:
             if workspace_root:
-                # Check if workspace_root is already decoded (doesn't contain %)
-                if "%" in workspace_root:
-                    # URL-decode the workspace root path in case it comes from a FileUrl
-                    decoded_root = unquote(workspace_root)
-                else:
-                    # Already decoded
-                    decoded_root = workspace_root
-                return Path(decoded_root) / ".github" / "instructions"
+                return self._build_workspace_instructions_path(workspace_root)
             return self.workspace_prompts_dir
         return self.prompts_dir
 
     def _ensure_workspace_instructions_dir(self, workspace_root: Optional[str] = None) -> None:
         """Ensure workspace instructions directory exists."""
         if workspace_root:
-            # Check if workspace_root is already decoded (doesn't contain %)
-            if "%" in workspace_root:
-                # URL-decode the workspace root path in case it comes from a FileUrl
-                decoded_root = unquote(workspace_root)
-            else:
-                # Already decoded
-                decoded_root = workspace_root
-            workspace_dir = Path(decoded_root) / ".github" / "instructions"
+            workspace_dir = self._build_workspace_instructions_path(workspace_root)
             workspace_dir.mkdir(parents=True, exist_ok=True)
         else:
             self.workspace_prompts_dir.mkdir(parents=True, exist_ok=True)
@@ -115,35 +156,22 @@ class InstructionManager:
             if workspace_root is None:
                 raise FileOperationError("Workspace root is required for workspace scope memory operations")
             # Use the provided workspace root, URL-decoded in case it comes from a FileUrl
-            decoded_root = unquote(workspace_root)
-            self.workspace_prompts_dir = Path(decoded_root) / ".github" / "instructions"
-            self._ensure_workspace_instructions_dir(decoded_root)
+            self.workspace_prompts_dir = self._build_workspace_instructions_path(workspace_root)
+            self._ensure_workspace_instructions_dir(workspace_root)
 
         prompts_dir = self._get_prompts_dir(scope, workspace_root)
         apply_to_pattern = self._get_apply_to_pattern(language)
 
-        # Determine filename based on scope and language
-        if language:
-            filename = f"memory-{language.lower()}{INSTRUCTION_FILE_EXTENSION}"
-            description = f"Personal AI memory for {language} development"
-        else:
-            filename = f"memory{INSTRUCTION_FILE_EXTENSION}"
-            if scope == MemoryScope.workspace:
-                description = "Workspace-specific AI memory for this project"
-            else:
-                description = "Personal AI memory for conversations and preferences"
+        # Use MemoryFileConfig to handle file configuration
+        config = MemoryFileConfig(scope, language)
+        filename = config.filename
+        description = config.description
 
         file_path = prompts_dir / filename
 
         # Create file if it doesn't exist
         if not file_path.exists():
-            initial_content = f"# {'Workspace' if scope == MemoryScope.workspace else 'Personal'} AI Memory"
-            if language:
-                initial_content += f" - {language.title()}"
-            initial_content += f"\nThis file contains {'workspace-specific' if scope == MemoryScope.workspace else 'personal'} information for AI conversations."
-            if language:
-                initial_content += f" Specifically for {language} development."
-            initial_content += "\n\n## Memories\n"
+            initial_content = config.initial_content
 
             frontmatter = {"applyTo": apply_to_pattern, "description": description}
 
@@ -194,8 +222,7 @@ class InstructionManager:
         Raises:
             FileOperationError: If file cannot be updated
         """
-        if not instruction_name.endswith(INSTRUCTION_FILE_EXTENSION):
-            instruction_name += INSTRUCTION_FILE_EXTENSION
+        instruction_name = self._ensure_instruction_extension(instruction_name)
 
         prompts_dir = self._get_prompts_dir(scope, workspace_root)
         file_path = prompts_dir / instruction_name
@@ -274,8 +301,7 @@ class InstructionManager:
         """
 
         # Ensure filename has correct extension
-        if not instruction_name.endswith(INSTRUCTION_FILE_EXTENSION):
-            instruction_name += INSTRUCTION_FILE_EXTENSION
+        instruction_name = self._ensure_instruction_extension(instruction_name)
 
         prompts_dir = self._get_prompts_dir(scope)
         file_path = prompts_dir / instruction_name
@@ -317,8 +343,7 @@ class InstructionManager:
         """
 
         # Ensure filename has correct extension
-        if not instruction_name.endswith(INSTRUCTION_FILE_EXTENSION):
-            instruction_name += INSTRUCTION_FILE_EXTENSION
+        instruction_name = self._ensure_instruction_extension(instruction_name)
 
         prompts_dir = self._get_prompts_dir(scope)
         file_path = prompts_dir / instruction_name
@@ -350,8 +375,7 @@ class InstructionManager:
         """
 
         # Ensure filename has correct extension
-        if not instruction_name.endswith(INSTRUCTION_FILE_EXTENSION):
-            instruction_name += INSTRUCTION_FILE_EXTENSION
+        instruction_name = self._ensure_instruction_extension(instruction_name)
 
         file_path = self.prompts_dir / instruction_name
 
@@ -393,8 +417,7 @@ class InstructionManager:
             FileOperationError: If file cannot be updated
         """
         # Ensure filename has correct extension
-        if not instruction_name.endswith(INSTRUCTION_FILE_EXTENSION):
-            instruction_name += INSTRUCTION_FILE_EXTENSION
+        instruction_name = self._ensure_instruction_extension(instruction_name)
 
         file_path = self.prompts_dir / instruction_name
 
@@ -440,8 +463,7 @@ class InstructionManager:
         """
 
         # Ensure filename has correct extension
-        if not instruction_name.endswith(INSTRUCTION_FILE_EXTENSION):
-            instruction_name += INSTRUCTION_FILE_EXTENSION
+        instruction_name = self._ensure_instruction_extension(instruction_name)
 
         file_path = self.prompts_dir / instruction_name
 

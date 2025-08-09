@@ -72,9 +72,7 @@ async def _create_workspace_memory(ctx: Context, memory_item: str, language: Opt
                 root_uri = roots[0].uri
                 parsed = urlparse(root_uri.encoded_string())
                 host = "{0}{0}{mnt}{0}".format(os.path.sep, mnt=parsed.netloc)
-                normpath = os.path.normpath(
-                    os.path.join(host, url2pathname(unquote(parsed.path)))
-                )
+                normpath = os.path.normpath(os.path.join(host, url2pathname(unquote(parsed.path))))
                 workspace_root_str = normpath
         except Exception as e:
             logger.warning(f"Failed to get workspace root from context: {e}")
