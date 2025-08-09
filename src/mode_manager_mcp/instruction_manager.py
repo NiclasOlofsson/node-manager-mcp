@@ -3,6 +3,8 @@ Mode Manager for VS Code .instructions.md files.
 
 This module handles instruction files which define custom instructions
 and workspace-specific AI guidance for VS Code Copilot.
+
+Note: This file has been refactored to eliminate DRY violations.
 """
 
 import json
