@@ -51,7 +51,7 @@ async def _create_user_memory(ctx: Context, memory_item: str, language: Optional
     instruction_manager = registry.instruction_manager
 
     try:
-        result = instruction_manager.create_memory(memory_item, scope=MemoryScope.user, language=language)
+        result = await instruction_manager.create_memory_with_optimization(memory_item, ctx, scope=MemoryScope.user, language=language)
         return result
     except Exception as e:
         return {"status": "error", "message": str(e)}
@@ -83,7 +83,7 @@ async def _create_workspace_memory(ctx: Context, memory_item: str, language: Opt
         if workspace_root_str is None:
             return {"status": "error", "message": "Sorry, but I couldn't find the workspace root. Workspace memory requires access to the current workspace context."}
 
-        result = instruction_manager.create_memory(memory_item, scope=MemoryScope.workspace, language=language, workspace_root=workspace_root_str)
+        result = await instruction_manager.create_memory_with_optimization(memory_item, ctx, scope=MemoryScope.workspace, language=language, workspace_root=workspace_root_str)
         return result
     except Exception as e:
         return {"status": "error", "message": str(e)}

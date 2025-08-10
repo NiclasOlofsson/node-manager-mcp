@@ -200,6 +200,44 @@ class InstructionManager:
             "apply_to": apply_to_pattern,
         }
 
+    async def create_memory_with_optimization(
+        self,
+        memory_item: str,
+        ctx: Any,  # FastMCP Context
+        scope: MemoryScope = MemoryScope.user,
+        language: Optional[str] = None,
+        workspace_root: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """
+        Enhanced create_memory that includes smart optimization.
+
+        Fully backward compatible with existing memory files.
+        """
+        # First, create/append memory using existing logic
+        result = self.create_memory(memory_item, scope, language, workspace_root)
+
+        if result["status"] == "success":
+            # Try to optimize if needed
+            from .memory_optimizer import MemoryOptimizer
+
+            file_path = Path(result["path"])
+            optimizer = MemoryOptimizer(self)
+
+            optimization_result = await optimizer.optimize_memory_if_needed(file_path, ctx)
+
+            # Add optimization info to result
+            result["optimization"] = optimization_result
+
+            # Update success message based on optimization outcome
+            if optimization_result["status"] == "optimized":
+                result["message"] = f"Memory added and optimized: {memory_item}"
+            elif optimization_result["status"] == "metadata_updated":
+                result["message"] = f"Memory added with metadata update: {memory_item}"
+            else:
+                result["message"] = f"Memory added: {memory_item}"
+
+        return result
+
     def append_to_section(
         self,
         instruction_name: str,
@@ -480,3 +518,19 @@ class InstructionManager:
 
         except Exception as e:
             raise FileOperationError(f"Error deleting instruction file {instruction_name}: {e}")
+
+    def get_memory_file_path(self, scope: MemoryScope = MemoryScope.user, language: Optional[str] = None, workspace_root: Optional[str] = None) -> Path:
+        """
+        Get the path to a memory file.
+
+        Args:
+            scope: Memory scope (user or workspace)
+            language: Optional language for language-specific memory
+            workspace_root: Optional workspace root path (for workspace scope)
+
+        Returns:
+            Path to the memory file
+        """
+        prompts_dir = self._get_prompts_dir(scope, workspace_root)
+        config = MemoryFileConfig(scope, language)
+        return prompts_dir / config.filename
