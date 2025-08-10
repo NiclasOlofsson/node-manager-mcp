@@ -8,5 +8,5 @@ pattern with tools organized in separate modules.
 
 from .simple_server import create_server
 
-__version__ = "0.1.18"
+__version__ = "0.1.19"
 __all__ = ["create_server"]
