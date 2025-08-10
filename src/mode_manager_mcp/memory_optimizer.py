@@ -15,6 +15,8 @@ from fastmcp import Context
 
 from .simple_file_ops import (
     FileOperationError,
+    _is_in_git_repository,
+    parse_frontmatter,
     parse_frontmatter_file,
     write_frontmatter_file,
 )
@@ -272,18 +274,8 @@ Return ONLY the optimized content (including frontmatter), nothing else:
             optimized_content = await self._optimize_memory_with_ai(ctx, full_content)
 
             if optimized_content:
-                # Parse optimized content to separate frontmatter and body
-                optimized_frontmatter, optimized_body = parse_frontmatter_file(Path("temp"))
-
-                # Create temporary file to parse the optimized content
-                temp_path = Path("temp_optimization.md")
-                try:
-                    with open(temp_path, "w", encoding="utf-8") as f:
-                        f.write(optimized_content)
-                    optimized_frontmatter, optimized_body = parse_frontmatter_file(temp_path)
-                finally:
-                    if temp_path.exists():
-                        temp_path.unlink()
+                # Parse optimized content directly from string
+                optimized_frontmatter, optimized_body = parse_frontmatter(optimized_content)
 
                 # Update metadata in the optimized frontmatter
                 entry_count = self._count_memory_entries(optimized_body)
@@ -306,18 +298,24 @@ Return ONLY the optimized content (including frontmatter), nothing else:
 
                 # Write optimized content
                 success = write_frontmatter_file(file_path, optimized_frontmatter, optimized_body, create_backup=True)
+                
+                # Determine if backup was actually created (skipped for git repos)
+                backup_created = False if _is_in_git_repository(file_path) else success
 
                 if success:
                     logger.info(f"Memory optimization completed successfully")
-                    return {"status": "optimized", "reason": reason, "method": "ai", "entries_before": metadata.get("entryCount", 0), "entries_after": entry_count, "backup_created": True}
+                    return {"status": "optimized", "reason": reason, "method": "ai", "entries_before": metadata.get("entryCount", 0), "entries_after": entry_count, "backup_created": backup_created}
                 else:
                     return {"status": "error", "reason": "Failed to write optimized content"}
             else:
                 # AI optimization failed, just update metadata
                 logger.info("AI optimization unavailable, updating metadata only")
                 success = self._update_metadata(file_path, content)
+                
+                # Determine if backup was actually created (skipped for git repos)
+                backup_created = False if _is_in_git_repository(file_path) else success
 
-                return {"status": "metadata_updated", "reason": reason, "method": "metadata_only", "ai_available": False, "backup_created": success}
+                return {"status": "metadata_updated", "reason": reason, "method": "metadata_only", "ai_available": False, "backup_created": backup_created}
 
         except Exception as e:
             logger.error(f"Memory optimization failed: {e}")

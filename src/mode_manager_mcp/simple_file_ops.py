@@ -21,6 +21,38 @@ class FileOperationError(Exception):
     pass
 
 
+def _is_in_git_repository(file_path: Path) -> bool:
+    """
+    Check if a file is in a git repository by looking for .git directory.
+
+    Args:
+        file_path: Path to check
+
+    Returns:
+        True if the file is in a git repository, False otherwise
+    """
+    try:
+        # Start from the file's directory and walk up the directory tree
+        current_path = file_path.parent if file_path.is_file() else file_path
+        
+        # Walk up the directory tree looking for .git
+        while True:
+            git_dir = current_path / ".git"
+            if git_dir.exists():
+                return True
+            
+            # Check if we've reached the filesystem root
+            parent = current_path.parent
+            if parent == current_path:
+                break
+            current_path = parent
+        
+        return False
+    except Exception:
+        # If any error occurs, assume it's not a git repository
+        return False
+
+
 def parse_frontmatter_file(file_path: Union[str, Path]) -> Tuple[Dict[str, Any], str]:
     """
     Parse a file with YAML frontmatter.
@@ -130,7 +162,14 @@ def write_frontmatter_file(
     try:
         # Create backup if file exists and backup is requested
         file_path = Path(file_path)
-        if create_backup and file_path.exists():
+        
+        # Skip backup if file is in a git repository (git provides version control)
+        is_git_repo = _is_in_git_repository(file_path) if file_path.exists() else False
+        should_create_backup = create_backup and file_path.exists() and not is_git_repo
+        
+        logger.debug(f"Backup decision for {file_path}: create_backup={create_backup}, exists={file_path.exists()}, is_git_repo={is_git_repo}, should_create_backup={should_create_backup}")
+        
+        if should_create_backup:
             import datetime
 
             timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -138,6 +177,8 @@ def write_frontmatter_file(
 
             shutil.copy2(file_path, backup_path)
             logger.info(f"Created backup before write: {backup_path}")
+        elif file_path.exists() and is_git_repo:
+            logger.info(f"Skipping backup for git-tracked file: {file_path}")
 
         # Create frontmatter YAML
         frontmatter_lines = ["---"]
@@ -208,7 +249,11 @@ def write_file_with_backup(file_path: Union[str, Path], content: str, create_bac
     try:
         # Create backup if file exists and backup is requested
         file_path = Path(file_path)
-        if create_backup and file_path.exists():
+        
+        # Skip backup if file is in a git repository (git provides version control)
+        should_create_backup = create_backup and file_path.exists() and not _is_in_git_repository(file_path)
+        
+        if should_create_backup:
             import datetime
 
             timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -216,6 +261,8 @@ def write_file_with_backup(file_path: Union[str, Path], content: str, create_bac
 
             shutil.copy2(file_path, backup_path)
             logger.info(f"Created backup before write: {backup_path}")
+        elif file_path.exists() and _is_in_git_repository(file_path):
+            logger.debug(f"Skipping backup for git-tracked file: {file_path}")
 
         # Ensure parent directory exists
         file_path.parent.mkdir(parents=True, exist_ok=True)
@@ -252,7 +299,10 @@ def safe_delete_file(file_path: Union[str, Path], create_backup: bool = True) ->
         return True
 
     try:
-        if create_backup:
+        # Skip backup if file is in a git repository (git provides version control)
+        should_create_backup = create_backup and not _is_in_git_repository(file_path)
+        
+        if should_create_backup:
             # Create backup with timestamp
             import datetime
 
@@ -261,6 +311,8 @@ def safe_delete_file(file_path: Union[str, Path], create_backup: bool = True) ->
 
             shutil.copy2(file_path, backup_path)
             logger.info(f"Created backup: {backup_path}")
+        elif _is_in_git_repository(file_path):
+            logger.debug(f"Skipping backup for git-tracked file before deletion: {file_path}")
 
         # Delete the file
         file_path.unlink()
