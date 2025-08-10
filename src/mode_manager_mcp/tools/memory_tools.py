@@ -1,7 +1,7 @@
 """Tools for managing memory optimization."""
 
-from typing import Annotated, Optional
 from pathlib import Path
+from typing import Annotated, Optional
 
 from fastmcp import Context
 
